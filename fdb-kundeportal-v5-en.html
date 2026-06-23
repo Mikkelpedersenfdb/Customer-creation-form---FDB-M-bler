@@ -768,7 +768,6 @@ function updateTerms() {
   html += row('Cancellation', 'Production orders cancelled < 14 days before delivery: 100% charge');
   html += row('Credit terms', CREDIT[type]);
   if (t.note && !exworks) html += `<div class="terms-note">${t.note}</div>`;
-  document.getElementById('terms-content').innerHTML = html;
   box.classList.add('visible');
 }
 
