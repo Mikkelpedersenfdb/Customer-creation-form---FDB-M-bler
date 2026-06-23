@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FDB Møbler — Wholesale Registration</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sand: #F2EEE8;
+  --sand-dark: #E8E2D9;
+  --oak: #B8956A;
+  --oak-dark: #9A7A55;
+  --charcoal: #1E1C1A;
+  --warm-grey: #6B6560;
+  --light-grey: #C8C3BC;
+  --border: #DDD8D0;
+  --white: #FFFFFF;
+  --success: #4A7C59;
+  --success-bg: #EEF4F0;
+  --info-bg: #F5F0E8;
+  --radius: 4px;
+}
+
+body { font-family: 'Inter', sans-serif; background: var(--sand); color: var(--charcoal); min-height: 100vh; line-height: 1.5; }
+
+header {
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 0 48px; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo-area { display: flex; align-items: center; gap: 14px; }
+.logo-box { width: 36px; height: 36px; background: var(--charcoal); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; letter-spacing: 0.05em; }
+.logo-text { display: flex; flex-direction: column; line-height: 1; }
+.logo-name { font-weight: 600; font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase; }
+.logo-sub { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-grey); margin-top: 3px; }
+.header-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--oak); background: var(--info-bg); border: 1px solid rgba(184,149,106,0.4); padding: 4px 10px; border-radius: 2px; }
+
+main { display: flex; min-height: calc(100vh - 64px); }
+
+.sidebar {
+  width: 280px; flex-shrink: 0; background: var(--charcoal);
+  padding: 44px 32px; position: sticky; top: 64px;
+  height: calc(100vh - 64px); overflow-y: auto; display: flex; flex-direction: column;
+}
+.sidebar-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; color: var(--white); line-height: 1.2; margin-bottom: 6px; }
+.sidebar-sub { font-size: 11.5px; color: var(--light-grey); line-height: 1.6; margin-bottom: 36px; }
+.steps-nav { display: flex; flex-direction: column; gap: 0; flex: 1; }
+.step-nav-item { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.07); cursor: pointer; opacity: 0.4; transition: opacity 0.2s; }
+.step-nav-item:last-child { border-bottom: none; }
+.step-nav-item.active { opacity: 1; }
+.step-nav-item.done { opacity: 0.55; }
+.step-nav-dot { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: all 0.2s; }
+.step-nav-item.active .step-nav-dot { background: var(--oak); border-color: var(--oak); }
+.step-nav-item.done .step-nav-dot { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); }
+.step-nav-dot span { font-size: 10px; font-weight: 600; color: white; }
+.step-nav-item.done .step-nav-dot span { display: none; }
+.step-nav-item.done .step-nav-dot::after { content: ''; width: 8px; height: 5px; border-left: 1.5px solid white; border-bottom: 1.5px solid white; transform: rotate(-45deg) translateY(-1px); display: block; }
+.step-nav-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: white; margin-bottom: 2px; }
+.step-nav-desc { font-size: 10.5px; color: var(--light-grey); line-height: 1.4; }
+.sidebar-footer { margin-top: auto; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: rgba(255,255,255,0.28); line-height: 1.7; }
+
+.content { flex: 1; padding: 48px; max-width: 720px; }
+.step { display: none; }
+.step.active { display: block; }
+
+.step-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--oak); margin-bottom: 8px; }
+.step-title { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; letter-spacing: -0.01em; color: var(--charcoal); margin-bottom: 6px; line-height: 1.1; }
+.step-desc { font-size: 13px; color: var(--warm-grey); margin-bottom: 32px; line-height: 1.6; }
+
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+.field-grid.single { grid-template-columns: 1fr; }
+.field-grid.thirds { grid-template-columns: 1fr 1fr 1fr; }
+.field { display: flex; flex-direction: column; }
+.field.span2 { grid-column: span 2; }
+.field.span3 { grid-column: span 3; }
+.field label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--warm-grey); margin-bottom: 7px; }
+.field input, .field select, .field textarea {
+  font-family: 'Inter', sans-serif; font-size: 13.5px; color: var(--charcoal);
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 10px 13px; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none; -webkit-appearance: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--oak); box-shadow: 0 0 0 3px rgba(184,149,106,0.12); }
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B6560' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer;
+}
+
+.field-hint { font-size: 11px; color: var(--light-grey); margin-top: 5px; line-height: 1.4; }
+
+.divider { display: flex; align-items: center; gap: 12px; margin: 28px 0 20px; }
+.divider span { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--warm-grey); white-space: nowrap; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Opening hours table */
+.hours-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+.hours-table th { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--warm-grey); padding: 8px 10px; text-align: left; background: var(--sand); border: 1px solid var(--border); }
+.hours-table td { padding: 0; border: 1px solid var(--border); }
+.hours-table td input { border: none; border-radius: 0; padding: 9px 10px; font-size: 13px; width: 100%; background: var(--white); }
+.hours-table td input:focus { box-shadow: inset 0 0 0 2px var(--oak); outline: none; }
+
+/* Trade Terms box */
+.terms-box { background: var(--info-bg); border: 1px solid rgba(184,149,106,0.5); border-radius: var(--radius); padding: 20px 22px; margin-top: 20px; display: none; }
+.terms-box.visible { display: block; }
+.terms-box-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.terms-box-header svg { width: 14px; height: 14px; stroke: var(--oak); flex-shrink: 0; }
+.terms-box-title { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--oak-dark); }
+.terms-country { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--charcoal); margin-bottom: 12px; }
+.terms-row { display: flex; gap: 8px; margin-bottom: 7px; font-size: 12.5px; line-height: 1.5; }
+.terms-row:last-of-type { margin-bottom: 0; }
+.terms-label { font-weight: 600; color: var(--charcoal); white-space: nowrap; min-width: 130px; }
+.terms-value { color: var(--warm-grey); }
+.terms-note { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(184,149,106,0.2); font-size: 11.5px; color: var(--warm-grey); font-style: italic; line-height: 1.5; }
+
+/* Upload */
+.upload-zone { border: 1.5px dashed var(--border); border-radius: var(--radius); background: var(--white); padding: 28px 24px; text-align: center; cursor: pointer; position: relative; transition: border-color 0.2s, background 0.2s; }
+.upload-zone:hover, .upload-zone.dragover { border-color: var(--oak); background: var(--info-bg); }
+.upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon-wrap { width: 38px; height: 38px; margin: 0 auto 12px; background: var(--sand); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.upload-icon-wrap svg { width: 17px; height: 17px; stroke: var(--oak); }
+.upload-main { font-size: 14px; font-weight: 500; color: var(--charcoal); margin-bottom: 4px; }
+.upload-sub { font-size: 11.5px; color: var(--warm-grey); }
+.file-list { margin-top: 12px; display: flex; flex-direction: column; gap: 7px; }
+.file-item { display: flex; align-items: center; gap: 10px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 13px; font-size: 12.5px; }
+.file-item svg { flex-shrink: 0; stroke: var(--oak); width: 15px; height: 15px; }
+.file-name { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-size { font-size: 11px; color: var(--warm-grey); white-space: nowrap; }
+.file-remove { background: none; border: none; cursor: pointer; color: var(--light-grey); padding: 2px 4px; display: flex; align-items: center; transition: color 0.15s; }
+.file-remove:hover { color: #8B3A2F; }
+.file-remove svg { width: 13px; height: 13px; stroke: currentColor; }
+
+/* Consent */
+.consent-block { background: var(--sand-dark); border-radius: var(--radius); padding: 16px 18px; margin: 24px 0 0; }
+.consent-row { display: flex; gap: 10px; align-items: flex-start; }
+.consent-row input[type="checkbox"] { width: 15px; height: 15px; margin-top: 2px; accent-color: var(--oak); cursor: pointer; flex-shrink: 0; }
+.consent-row label { font-size: 12.5px; color: var(--warm-grey); line-height: 1.55; cursor: pointer; }
+
+/* Newsletter row */
+.newsletter-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; }
+.newsletter-row input[type="checkbox"] { width: 15px; height: 15px; margin-top: 2px; accent-color: var(--oak); cursor: pointer; flex-shrink: 0; }
+.newsletter-row label { font-size: 12.5px; color: var(--warm-grey); line-height: 1.55; cursor: pointer; }
+
+/* Buttons */
+.btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; }
+.btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: none; border-radius: var(--radius); padding: 13px 28px; cursor: pointer; transition: all 0.15s; }
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--charcoal); color: white; }
+.btn-primary:hover { background: #2E2B28; }
+.btn-primary:disabled { background: var(--light-grey); cursor: not-allowed; transform: none; }
+.btn-ghost { background: transparent; color: var(--warm-grey); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: var(--charcoal); color: var(--charcoal); }
+
+.error-msg { background: #FDF0EE; border: 1px solid #C0392B; border-radius: var(--radius); padding: 12px 16px; margin-top: 16px; font-size: 13px; color: #8B3A2F; display: none; }
+.error-msg.visible { display: block; }
+
+/* Success */
+.success-screen { max-width: 460px; padding: 8px 0; }
+.success-icon-wrap { width: 50px; height: 50px; background: var(--success-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 22px; }
+.success-icon-wrap svg { width: 22px; height: 22px; stroke: var(--success); stroke-width: 2.5; }
+.success-title { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: var(--charcoal); margin-bottom: 12px; line-height: 1.1; }
+.success-text { font-size: 13.5px; color: var(--warm-grey); line-height: 1.7; margin-bottom: 24px; }
+.ref-box { display: inline-flex; align-items: center; gap: 10px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 18px; margin-bottom: 32px; }
+.ref-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--warm-grey); }
+.ref-value { font-size: 14px; font-weight: 600; color: var(--charcoal); letter-spacing: 0.05em; }
+.next-steps { background: var(--sand-dark); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 28px; }
+.next-steps-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--charcoal); margin-bottom: 10px; }
+.next-step-row { display: flex; gap: 10px; font-size: 12.5px; color: var(--warm-grey); margin-bottom: 6px; line-height: 1.5; }
+.next-step-row:last-child { margin-bottom: 0; }
+.next-step-n { font-weight: 700; color: var(--oak); flex-shrink: 0; }
+
+@media (max-width: 900px) {
+  main { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; padding: 24px; }
+  .steps-nav { flex-direction: row; overflow-x: auto; }
+  .step-nav-item { flex-direction: column; align-items: center; text-align: center; padding: 10px 8px; border-bottom: none; border-right: 1px solid rgba(255,255,255,0.07); min-width: 70px; }
+  .step-nav-item:last-child { border-right: none; }
+  .step-nav-desc, .sidebar-footer, .sidebar-sub { display: none; }
+  .content { padding: 28px 20px; }
+  .field-grid, .field-grid.thirds { grid-template-columns: 1fr; }
+  .field.span2, .field.span3 { grid-column: span 1; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-box">FDB</div>
+    <div class="logo-text">
+      <span class="logo-name">Møbler</span>
+      <span class="logo-sub">— A Philosophy —</span>
+    </div>
+  </div>
+  <div class="header-tag">Wholesale B2B</div>
+</header>
+
+<main>
+  <aside class="sidebar">
+    <div class="sidebar-title">Customer<br>Registration</div>
+    <div class="sidebar-sub">Complete all steps — we'll process your account within 1–2 business days.</div>
+    <nav class="steps-nav">
+      <div class="step-nav-item active" id="nav-1" onclick="goStep(1)">
+        <div class="step-nav-dot"><span>1</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Account</div>
+          <div class="step-nav-desc">Type & agent info</div>
+        </div>
+      </div>
+      <div class="step-nav-item" id="nav-2" onclick="goStep(2)">
+        <div class="step-nav-dot"><span>2</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Contact</div>
+          <div class="step-nav-desc">Company & people</div>
+        </div>
+      </div>
+      <div class="step-nav-item" id="nav-3" onclick="goStep(3)">
+        <div class="step-nav-dot"><span>3</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Addresses</div>
+          <div class="step-nav-desc">Invoice & delivery</div>
+        </div>
+      </div>
+      <div class="step-nav-item" id="nav-4" onclick="goStep(4)">
+        <div class="step-nav-dot"><span>4</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Delivery</div>
+          <div class="step-nav-desc">Hours & logistics</div>
+        </div>
+      </div>
+      <div class="step-nav-item" id="nav-5" onclick="goStep(5)">
+        <div class="step-nav-dot"><span>5</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Trade Terms</div>
+          <div class="step-nav-desc">Market & terms</div>
+        </div>
+      </div>
+      <div class="step-nav-item" id="nav-6" onclick="goStep(6)">
+        <div class="step-nav-dot"><span>6</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Documents</div>
+          <div class="step-nav-desc">Files & submit</div>
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      Submitted to<br>Mikkel Pedersen · FDB Møbler A/S<br><br>
+      Questions? order@fdbmobler.dk<br>
+      +45 43 86 29 30
+    </div>
+  </aside>
+
+  <div class="content">
+
+    <!-- STEP 1: ACCOUNT SETUP -->
+    <div class="step active" id="step-1">
+      <div class="step-eyebrow">Step 1 of 6</div>
+      <div class="step-title">Account Setup</div>
+      <div class="step-desc">Basic account settings — to be filled out by the agent.</div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label>Customer Group *</label>
+          <select id="f-customergroup">
+            <option value="">Select…</option>
+            <option>WHOLESALE DENMARK</option>
+            <option>WHOLESALE NO/SE</option>
+            <option>EXPORT WS/CONTRACT (all other markets than DK/SE/NO)</option>
+            <option>CONTRACT SCANDINAVIA (Contract dealer DK/SE/NO)</option>
+            <option>B2B-GIFT</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Type of Business *</label>
+          <select id="f-businesstype">
+            <option value="">Select…</option>
+            <option>WS_RETAIL — Sale through retailer stores only</option>
+            <option>WS_ONLINE — Online sales through website only</option>
+            <option>WS_OMNICHANNEL — Both stores and online</option>
+            <option>WS_CHAIN — Sales through a chain of retail stores</option>
+            <option>ARCHITECT — Architects, freelancers for projects</option>
+            <option>CONTRACT PROJECT DEALER — Contract dealers on projects</option>
+            <option>CONTRACT END-USER — Direct sales to companies</option>
+            <option>B2B-GIFT — Gift dealer</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Currency *</label>
+          <select id="f-currency">
+            <option value="">Select…</option>
+            <option>DKK</option>
+            <option>EUR</option>
+            <option>GBP</option>
+            <option>NOK</option>
+            <option>SEK</option>
+            <option>USD</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Discount Agreement %</label>
+          <input type="number" id="f-discount" placeholder="e.g. 40" min="0" max="100" step="1" />
+        </div>
+        <div class="field">
+          <label>Agent</label>
+          <input type="text" id="f-agent" placeholder="Agent name" />
+        </div>
+        <div class="field">
+          <label>Language</label>
+          <select id="f-language">
+            <option value="">Select…</option>
+            <option>EN</option>
+            <option>DK</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="f-date" />
+        </div>
+      </div>
+
+      <div class="divider"><span>Newsletter Subscription</span></div>
+      <div class="field-grid single">
+        <div class="field">
+          <label>Newsletter Email(s)</label>
+          <input type="text" id="f-newsletter-email" placeholder="email@company.com (separate multiple with comma)" />
+          <span class="field-hint">Sign up for newsletters, price lists and campaign lists by email.</span>
+        </div>
+      </div>
+      <div class="newsletter-row">
+        <input type="checkbox" id="f-newsletter-accept" />
+        <label for="f-newsletter-accept">Customer accepts to receive newsletters, price lists and campaign emails from FDB Møbler.</label>
+      </div>
+
+      <div class="btn-row">
+        <span></span>
+        <button class="btn btn-primary" onclick="goStep(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: CONTACT INFORMATION -->
+    <div class="step" id="step-2">
+      <div class="step-eyebrow">Step 2 of 6</div>
+      <div class="step-title">Contact Information</div>
+      <div class="step-desc">To be filled out by the customer.</div>
+
+      <div class="field-grid">
+        <div class="field span2">
+          <label>Company Name *</label>
+          <input type="text" id="f-company" placeholder="Company name" />
+        </div>
+        <div class="field">
+          <label>VAT No.</label>
+          <input type="text" id="f-vat" placeholder="e.g. DK12345678" />
+        </div>
+        <div class="field">
+          <label>SAFE No.</label>
+          <input type="text" id="f-safe" placeholder="SAFE number" />
+        </div>
+        <div class="field">
+          <label>EAN No.</label>
+          <input type="text" id="f-ean" placeholder="EAN number" />
+        </div>
+        <div class="field">
+          <label>EORI No. <span style="font-weight:400;text-transform:none;letter-spacing:0">(UK customers)</span></label>
+          <input type="text" id="f-eori" placeholder="EORI number" />
+        </div>
+      </div>
+
+      <div class="divider"><span>Primary Contact Person</span></div>
+      <div class="field-grid">
+        <div class="field span2">
+          <label>Contact Person *</label>
+          <input type="text" id="f-contact-name" placeholder="Full name" />
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="tel" id="f-contact-phone" placeholder="+45 20 20 20 20" />
+        </div>
+        <div class="field">
+          <label>Email — Contact Person *</label>
+          <input type="email" id="f-contact-email" placeholder="contact@company.com" />
+        </div>
+      </div>
+
+      <div class="divider"><span>Email Addresses</span></div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Email — Order Confirmations</label>
+          <input type="email" id="f-email-orders" placeholder="orders@company.com" />
+        </div>
+        <div class="field">
+          <label>Email — Delivery Notes</label>
+          <input type="email" id="f-email-delivery" placeholder="warehouse@company.com" />
+        </div>
+        <div class="field">
+          <label>Email — Invoices</label>
+          <input type="email" id="f-email-invoice" placeholder="invoice@company.com" />
+        </div>
+        <div class="field">
+          <label>Email — Credit Notes / Statements</label>
+          <input type="email" id="f-email-credit" placeholder="finance@company.com" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: ADDRESSES -->
+    <div class="step" id="step-3">
+      <div class="step-eyebrow">Step 3 of 6</div>
+      <div class="step-title">Addresses</div>
+      <div class="step-desc">Invoice and delivery addresses for your account.</div>
+
+      <div class="divider" style="margin-top:0"><span>Invoice Address</span></div>
+      <div class="field-grid">
+        <div class="field span2">
+          <label>Company Name</label>
+          <input type="text" id="f-inv-company" placeholder="Company name on invoice" />
+        </div>
+        <div class="field span2">
+          <label>Street Name</label>
+          <input type="text" id="f-inv-street" placeholder="Street name and number" />
+        </div>
+        <div class="field">
+          <label>Zip Code</label>
+          <input type="text" id="f-inv-zip" placeholder="Postal code" />
+        </div>
+        <div class="field">
+          <label>City</label>
+          <input type="text" id="f-inv-city" placeholder="City" />
+        </div>
+        <div class="field">
+          <label>State / Region</label>
+          <input type="text" id="f-inv-state" placeholder="State or region" />
+        </div>
+        <div class="field">
+          <label>Country</label>
+          <input type="text" id="f-inv-country" placeholder="Country" />
+        </div>
+      </div>
+
+      <div class="divider"><span>Delivery Address</span></div>
+      <div class="field-grid">
+        <div class="field span2">
+          <label>Company Name</label>
+          <input type="text" id="f-del-company" placeholder="Company name for delivery" />
+        </div>
+        <div class="field span2">
+          <label>Street Name</label>
+          <input type="text" id="f-del-street" placeholder="Street name and number" />
+        </div>
+        <div class="field">
+          <label>Zip Code</label>
+          <input type="text" id="f-del-zip" placeholder="Postal code" />
+        </div>
+        <div class="field">
+          <label>City</label>
+          <input type="text" id="f-del-city" placeholder="City" />
+        </div>
+        <div class="field">
+          <label>State / Region</label>
+          <input type="text" id="f-del-state" placeholder="State or region" />
+        </div>
+        <div class="field">
+          <label>Country</label>
+          <input type="text" id="f-del-country" placeholder="Country" />
+        </div>
+        <div class="field">
+          <label>Contact Person — Delivery</label>
+          <input type="text" id="f-del-contact" placeholder="Name" />
+        </div>
+        <div class="field">
+          <label>Phone — Delivery</label>
+          <input type="tel" id="f-del-phone" placeholder="+45 20 20 20 20" />
+        </div>
+        <div class="field span2">
+          <label>Email — Delivery Contact</label>
+          <input type="email" id="f-del-email" placeholder="delivery@company.com" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(4)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: DELIVERY DETAILS -->
+    <div class="step" id="step-4">
+      <div class="step-eyebrow">Step 4 of 6</div>
+      <div class="step-title">Delivery Details</div>
+      <div class="step-desc">Logistics information to ensure smooth deliveries to your location.</div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label>Able to Deliver with Big Truck? *</label>
+          <select id="f-bigtruck">
+            <option value="">Select…</option>
+            <option>Yes</option>
+            <option>No — Additional fee will be added on orders</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Mandatory Slot Time / Fixed Delivery Booking?</label>
+          <select id="f-slottime">
+            <option value="">Select…</option>
+            <option>No</option>
+            <option>Yes — Additional fee will be added on orders</option>
+          </select>
+        </div>
+        <div class="field span2">
+          <label>Additional Delivery Information</label>
+          <textarea id="f-del-info" placeholder="Any special requirements, access restrictions, packaging return, etc."></textarea>
+        </div>
+        <div class="field span2">
+          <label>Delivery Comments</label>
+          <textarea id="f-del-comments" placeholder="Other delivery comments…"></textarea>
+        </div>
+      </div>
+
+      <div class="divider"><span>Opening Hours for Delivery (weekdays only)</span></div>
+      <table class="hours-table">
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>From</th>
+            <th>To</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:9px 10px;font-size:13px;font-weight:500;background:var(--sand);border:1px solid var(--border)">Monday</td><td><input type="time" id="f-mon-from" /></td><td><input type="time" id="f-mon-to" /></td></tr>
+          <tr><td style="padding:9px 10px;font-size:13px;font-weight:500;background:var(--sand);border:1px solid var(--border)">Tuesday</td><td><input type="time" id="f-tue-from" /></td><td><input type="time" id="f-tue-to" /></td></tr>
+          <tr><td style="padding:9px 10px;font-size:13px;font-weight:500;background:var(--sand);border:1px solid var(--border)">Wednesday</td><td><input type="time" id="f-wed-from" /></td><td><input type="time" id="f-wed-to" /></td></tr>
+          <tr><td style="padding:9px 10px;font-size:13px;font-weight:500;background:var(--sand);border:1px solid var(--border)">Thursday</td><td><input type="time" id="f-thu-from" /></td><td><input type="time" id="f-thu-to" /></td></tr>
+          <tr><td style="padding:9px 10px;font-size:13px;font-weight:500;background:var(--sand);border:1px solid var(--border)">Friday</td><td><input type="time" id="f-fri-from" /></td><td><input type="time" id="f-fri-to" /></td></tr>
+        </tbody>
+      </table>
+      <p class="field-hint" style="margin-top:10px">Standard delivery unless otherwise agreed. Extra fees may apply for missed deliveries, incorrect addresses or special truck requirements.</p>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(5)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: TRADE TERMS -->
+    <div class="step" id="step-5">
+      <div class="step-eyebrow">Step 5 of 6</div>
+      <div class="step-title">Market & Trade Terms</div>
+      <div class="step-desc">Select the customer's country and account type — applicable trade terms appear automatically.</div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label>Country / Market *</label>
+          <select id="f-country" onchange="updateTerms()">
+            <option value="">Select country…</option>
+            <optgroup label="Scandinavia">
+              <option value="DK">Denmark (DK)</option>
+              <option value="FO">Faroe Islands (FO)</option>
+              <option value="NO">Norway (NO)</option>
+              <option value="SE">Sweden (SE)</option>
+            </optgroup>
+            <optgroup label="Northern Europe">
+              <option value="FI">Finland (FI)</option>
+            </optgroup>
+            <optgroup label="Central Europe">
+              <option value="DE">Germany (DE)</option>
+              <option value="FR">France (FR)</option>
+              <option value="NL">Netherlands (NL)</option>
+              <option value="BE">Belgium (BE)</option>
+              <option value="LU">Luxembourg (LU)</option>
+            </optgroup>
+            <optgroup label="British Isles">
+              <option value="GB">United Kingdom (GB)</option>
+            </optgroup>
+            <optgroup label="Other Markets">
+              <option value="OTHER">Other market</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field">
+          <label>Account Type *</label>
+          <select id="f-accounttype" onchange="updateTerms()">
+            <option value="">Select…</option>
+            <option value="wholesale">Wholesale (Retail)</option>
+            <option value="contract">Contract / B2B</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Preferred Incoterm</label>
+          <select id="f-incoterm">
+            <option value="">Select…</option>
+            <option>DAP (Delivered at Place)</option>
+            <option>EX Works</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="terms-box" id="terms-box">
+        <div class="terms-box-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span class="terms-box-title">Trade Terms — SS2026</span>
+        </div>
+        <div class="terms-country" id="terms-country-name"></div>
+        <div id="terms-content"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(6)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: DOCUMENTS & SUBMIT -->
+    <div class="step" id="step-6">
+      <div class="step-eyebrow">Step 6 of 6</div>
+      <div class="step-title">Documents & Submit</div>
+      <div class="step-desc">Upload any relevant files, then submit the registration to Mikkel Pedersen.</div>
+
+      <div class="upload-zone" id="upload-zone"
+        ondragover="handleDragOver(event)"
+        ondragleave="handleDragLeave(event)"
+        ondrop="handleDrop(event)">
+        <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.xlsx,.xls" onchange="handleFiles(this.files)" />
+        <div class="upload-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="upload-main">Drag files here or click to browse</div>
+        <div class="upload-sub">PDF, Word, Excel, images · Optional</div>
+      </div>
+      <div class="file-list" id="file-list"></div>
+
+      <div class="consent-block">
+        <div class="consent-row">
+          <input type="checkbox" id="consent" />
+          <label for="consent">I confirm that the information provided is accurate, and I agree that FDB Møbler A/S may store and process this data in accordance with GDPR and applicable privacy policy. The customer acknowledges the trade terms for their market.</label>
+        </div>
+      </div>
+
+      <div style="font-size:11.5px; color:var(--warm-grey); margin-top:14px; line-height:1.6;">
+        This form will be submitted to <strong style="color:var(--charcoal)">Mikkel Pedersen</strong> · Mikkel.pedersen@fdbmobler.dk
+      </div>
+
+      <div class="error-msg" id="error-msg">
+        Something went wrong. Please try again or contact us at order@fdbmobler.dk
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(5)">← Back</button>
+        <button class="btn btn-primary" id="submit-btn" onclick="submitForm()">Submit Registration</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="step" id="step-success">
+      <div class="success-screen">
+        <div class="success-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="step-eyebrow">Received</div>
+        <div class="success-title">Registration<br>submitted</div>
+        <div class="success-text">The customer registration has been sent to Mikkel Pedersen at FDB Møbler. A confirmation email will follow, and the account will be processed within 1–2 business days.</div>
+        <div class="ref-box">
+          <span class="ref-label">Reference</span>
+          <span class="ref-value" id="ref-number">FDB-XXXXX</span>
+        </div>
+        <div class="next-steps">
+          <div class="next-steps-title">What happens next</div>
+          <div class="next-step-row"><span class="next-step-n">1.</span> A confirmation email is sent with the reference number.</div>
+          <div class="next-step-row"><span class="next-step-n">2.</span> The sales team reviews and sets up the account in the system.</div>
+          <div class="next-step-row"><span class="next-step-n">3.</span> The customer gains access to the B2B portal at btb.fdbmobler.dk</div>
+        </div>
+        <button class="btn btn-ghost" onclick="resetForm()">Register another customer</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+let currentStep = 1;
+let uploadedFiles = [];
+
+const TERMS = {
+  wholesale: {
+    DK:    { name:'Denmark (DK / FO)',    free:'7,500 DKK',  below:'500 DKK',   inco:'DAP / EX Works', fee:null,                            note:'Orders via order@fdbmobler.dk or btb.fdbmobler.dk' },
+    FO:    { name:'Faroe Islands (FO)',   free:'7,500 DKK',  below:'500 DKK',   inco:'DAP / EX Works', fee:null,                            note:null },
+    NO:    { name:'Norway (NO)',          free:'10,000 NOK', below:'1,000 NOK', inco:'DAP / EX Works', fee:'400 NOK (customs, mandatory)',   note:null },
+    SE:    { name:'Sweden (SE)',          free:'10,000 SEK', below:'1,000 SEK', inco:'DAP / EX Works', fee:null,                            note:null },
+    FI:    { name:'Finland (FI)',         free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    DE:    { name:'Germany (DE)',         free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    FR:    { name:'France (FR)',          free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    NL:    { name:'Benelux (NL/BE/LU)',   free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    BE:    { name:'Benelux (NL/BE/LU)',   free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    LU:    { name:'Benelux (NL/BE/LU)',   free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    GB:    { name:'United Kingdom (GB)',  free:'1,000 GBP',  below:'100 GBP',   inco:'DAP / EX Works', fee:'45 GBP (Brexit fee, mandatory)', note:null },
+    OTHER: { name:'Other Markets',        free:null,         below:null,        inco:'DAP / EX Works', fee:'45 EUR (non-EU countries)',     note:'Freight quotation required — contact order@fdbmobler.dk' },
+  },
+  contract: {
+    DK:    { name:'Denmark (DK / FO)',    free:null, below:'Below 7,500 DKK: 500 DKK fee · Above: 6% of order value',           inco:'DAP / EX Works', fee:null,                            note:'Via order@fdbmobler.dk or responsible contract person' },
+    FO:    { name:'Faroe Islands (FO)',   free:null, below:'Below 7,500 DKK: 500 DKK fee · Above: 6% of order value',           inco:'DAP / EX Works', fee:null,                            note:null },
+    NO:    { name:'Norway (NO)',          free:null, below:'Below 10,000 NOK: 1,000 NOK fee · Above: 6% of order value',        inco:'DAP / EX Works', fee:'400 NOK (customs, mandatory)',   note:null },
+    SE:    { name:'Sweden (SE)',          free:null, below:'Below 10,000 SEK: 1,000 SEK fee · Above: 6% of order value',       inco:'DAP / EX Works', fee:null,                            note:null },
+    FI:    { name:'Finland (FI)',         free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 10,000 EUR: 6% of order value', inco:'DAP / EX Works', fee:null,                           note:null },
+    DE:    { name:'Germany (DE)',         free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 10,000 EUR: 6% of order value', inco:'DAP / EX Works', fee:null,                           note:null },
+    FR:    { name:'France (FR)',          free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 10,000 EUR: 6% of order value', inco:'DAP / EX Works', fee:null,                           note:null },
+    NL:    { name:'Benelux (NL/BE/LU)',   free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 1,000 EUR: 6% of order value',  inco:'DAP / EX Works', fee:null,                           note:null },
+    BE:    { name:'Benelux (NL/BE/LU)',   free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 1,000 EUR: 6% of order value',  inco:'DAP / EX Works', fee:null,                           note:null },
+    LU:    { name:'Benelux (NL/BE/LU)',   free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 1,000 EUR: 6% of order value',  inco:'DAP / EX Works', fee:null,                           note:null },
+    GB:    { name:'United Kingdom (GB)',  free:null, below:'Below 1,000 GBP: 100 GBP fee · Above 1,000 GBP: 6% of order value', inco:'DAP / EX Works', fee:'45 GBP (Brexit fee, mandatory)', note:null },
+    OTHER: { name:'Other Markets',        free:null, below:null, inco:'DAP / EX Works', fee:'45 EUR (non-EU countries)', note:'Freight quotation required. Credit: prepayment unless otherwise agreed.' },
+  }
+};
+
+const CREDIT = {
+  wholesale: 'New customers: prepayment on first order. Credit limit up to 35,000 EUR / 250,000 DKK / 325,000 SEK/NOK.',
+  contract:  'Prepayment on all orders unless otherwise agreed.'
+};
+
+function updateTerms() {
+  const country = document.getElementById('f-country').value;
+  const type = document.getElementById('f-accounttype').value;
+  const box = document.getElementById('terms-box');
+  if (!country || !type) { box.classList.remove('visible'); return; }
+  const t = TERMS[type]?.[country];
+  if (!t) { box.classList.remove('visible'); return; }
+  document.getElementById('terms-country-name').textContent = t.name;
+  let html = '';
+  if (t.free) html += row('Freight free from', t.free);
+  if (t.below) html += row('Freight charge', t.below);
+  if (!t.free && !t.below) html += row('Freight', 'Quotation required');
+  html += row('Incoterms', t.inco);
+  if (t.fee) html += row('Mandatory fee', t.fee);
+  html += row('Cancellation', 'Production orders cancelled < 14 days before delivery: 100% charge');
+  html += row('Credit terms', CREDIT[type]);
+  if (t.note) html += `<div class="terms-note">${t.note}</div>`;
+  document.getElementById('terms-content').innerHTML = html;
+  box.classList.add('visible');
+}
+
+function row(label, value) {
+  return `<div class="terms-row"><span class="terms-label">${label}</span><span class="terms-value">${value}</span></div>`;
+}
+
+function goStep(n) {
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  document.getElementById('step-' + n).classList.add('active');
+  for (let i = 1; i <= 6; i++) {
+    const nav = document.getElementById('nav-' + i);
+    if (!nav) continue;
+    nav.className = 'step-nav-item';
+    if (i < n) nav.classList.add('done');
+    else if (i === n) nav.classList.add('active');
+  }
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function sel(id) { const el = document.getElementById(id); return el?.options[el.selectedIndex]?.text || ''; }
+function checked(id) { return document.getElementById(id)?.checked ? 'Yes' : 'No'; }
+
+function handleFiles(files) {
+  for (const f of files) { if (!uploadedFiles.find(x => x.name === f.name)) uploadedFiles.push(f); }
+  renderFileList();
+}
+function fileHTML(name, size, removable, idx) {
+  const kb = size < 1048576 ? Math.round(size/1024) + ' KB' : (size/1048576).toFixed(1) + ' MB';
+  return `<div class="file-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span class="file-name">${name}</span><span class="file-size">${kb}</span>
+    ${removable ? `<button class="file-remove" onclick="removeFile(${idx})"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
+  </div>`;
+}
+function renderFileList() { document.getElementById('file-list').innerHTML = uploadedFiles.map((f,i) => fileHTML(f.name, f.size, true, i)).join(''); }
+function removeFile(i) { uploadedFiles.splice(i, 1); renderFileList(); }
+function handleDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('dragover'); }
+function handleDragLeave() { document.getElementById('upload-zone').classList.remove('dragover'); }
+function handleDrop(e) { e.preventDefault(); document.getElementById('upload-zone').classList.remove('dragover'); handleFiles(e.dataTransfer.files); }
+
+async function submitForm() {
+  const consent = document.getElementById('consent');
+  if (!consent.checked) {
+    consent.style.outline = '2px solid #8B3A2F';
+    setTimeout(() => consent.style.outline = '', 2500);
+    return;
+  }
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  document.getElementById('error-msg').classList.remove('visible');
+
+  const formData = new FormData();
+  formData.append('_subject', 'New Customer Registration — FDB Møbler B2B Portal');
+
+  // Step 1 — Account setup
+  formData.append('Date',               v('f-date'));
+  formData.append('Customer Group',     sel('f-customergroup'));
+  formData.append('Type of Business',   sel('f-businesstype'));
+  formData.append('Currency',           sel('f-currency'));
+  formData.append('Discount %',         v('f-discount'));
+  formData.append('Agent',              v('f-agent'));
+  formData.append('Language',           sel('f-language'));
+  formData.append('Newsletter Email',   v('f-newsletter-email'));
+  formData.append('Newsletter Accept',  checked('f-newsletter-accept'));
+
+  // Step 2 — Contact
+  formData.append('Company Name',               v('f-company'));
+  formData.append('VAT No.',                    v('f-vat'));
+  formData.append('SAFE No.',                   v('f-safe'));
+  formData.append('EAN No.',                    v('f-ean'));
+  formData.append('EORI No.',                   v('f-eori'));
+  formData.append('Contact Person',             v('f-contact-name'));
+  formData.append('Phone — Contact',            v('f-contact-phone'));
+  formData.append('Email — Contact',            v('f-contact-email'));
+  formData.append('Email — Order Confirmations',v('f-email-orders'));
+  formData.append('Email — Delivery Notes',     v('f-email-delivery'));
+  formData.append('Email — Invoices',           v('f-email-invoice'));
+  formData.append('Email — Credit Notes',       v('f-email-credit'));
+
+  // Step 3 — Addresses
+  formData.append('Invoice — Company',   v('f-inv-company'));
+  formData.append('Invoice — Street',    v('f-inv-street'));
+  formData.append('Invoice — Zip',       v('f-inv-zip'));
+  formData.append('Invoice — City',      v('f-inv-city'));
+  formData.append('Invoice — State',     v('f-inv-state'));
+  formData.append('Invoice — Country',   v('f-inv-country'));
+  formData.append('Delivery — Company',  v('f-del-company'));
+  formData.append('Delivery — Street',   v('f-del-street'));
+  formData.append('Delivery — Zip',      v('f-del-zip'));
+  formData.append('Delivery — City',     v('f-del-city'));
+  formData.append('Delivery — State',    v('f-del-state'));
+  formData.append('Delivery — Country',  v('f-del-country'));
+  formData.append('Delivery — Contact',  v('f-del-contact'));
+  formData.append('Delivery — Phone',    v('f-del-phone'));
+  formData.append('Delivery — Email',    v('f-del-email'));
+
+  // Step 4 — Delivery details
+  formData.append('Big Truck',           sel('f-bigtruck'));
+  formData.append('Slot Time Required',  sel('f-slottime'));
+  formData.append('Additional Delivery Info', v('f-del-info'));
+  formData.append('Delivery Comments',   v('f-del-comments'));
+  formData.append('Opening Hours Monday',    v('f-mon-from') + ' – ' + v('f-mon-to'));
+  formData.append('Opening Hours Tuesday',   v('f-tue-from') + ' – ' + v('f-tue-to'));
+  formData.append('Opening Hours Wednesday', v('f-wed-from') + ' – ' + v('f-wed-to'));
+  formData.append('Opening Hours Thursday',  v('f-thu-from') + ' – ' + v('f-thu-to'));
+  formData.append('Opening Hours Friday',    v('f-fri-from') + ' – ' + v('f-fri-to'));
+
+  // Step 5 — Trade terms
+  const country = document.getElementById('f-country');
+  const accounttype = document.getElementById('f-accounttype');
+  const incoterm = document.getElementById('f-incoterm');
+  formData.append('Country / Market', country.options[country.selectedIndex]?.text || '');
+  formData.append('Account Type',     accounttype.options[accounttype.selectedIndex]?.text || '');
+  formData.append('Incoterm',         incoterm.options[incoterm.selectedIndex]?.text || '');
+  const t = TERMS[accounttype.value]?.[country.value];
+  if (t) {
+    let ts = `Market: ${t.name}`;
+    if (t.free) ts += ` | Freight free from: ${t.free}`;
+    if (t.below) ts += ` | Freight: ${t.below}`;
+    if (t.fee) ts += ` | Mandatory fee: ${t.fee}`;
+    formData.append('Trade Terms Summary', ts);
+  }
+
+  uploadedFiles.forEach(f => formData.append('Attachments', f));
+
+  try {
+    const res = await fetch('https://formspree.io/f/xzdlzdvw', {
+      method: 'POST', body: formData, headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      const ref = 'FDB-' + Date.now().toString(36).toUpperCase().slice(-5);
+      document.getElementById('ref-number').textContent = ref;
+      document.getElementById('step-6').classList.remove('active');
+      document.getElementById('step-success').classList.add('active');
+      for (let i = 1; i <= 6; i++) { const n = document.getElementById('nav-'+i); if(n) n.className = 'step-nav-item done'; }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else { throw new Error(); }
+  } catch(e) {
+    document.getElementById('error-msg').classList.add('visible');
+    btn.disabled = false;
+    btn.textContent = 'Submit Registration';
+  }
+}
+
+function resetForm() {
+  document.querySelectorAll('input,select,textarea').forEach(el => {
+    if (el.type === 'checkbox') el.checked = false;
+    else el.value = '';
+  });
+  document.getElementById('terms-box').classList.remove('visible');
+  uploadedFiles = []; renderFileList();
+  document.getElementById('step-success').classList.remove('active');
+  currentStep = 1;
+  document.getElementById('step-1').classList.add('active');
+  for (let i = 1; i <= 6; i++) { const n = document.getElementById('nav-'+i); if(n) { n.className = 'step-nav-item'; if(i===1) n.classList.add('active'); } }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
