@@ -596,7 +596,7 @@ main { display: flex; min-height: calc(100vh - 64px); }
         </div>
         <div class="field">
           <label>Preferred Incoterm</label>
-          <select id="f-incoterm">
+          <select id="f-incoterm">select id="f-incoterm" onchange="updateTerms()">
             <option value="">Select…</option>
             <option>DAP (Delivered at Place)</option>
             <option>EX Works</option>
@@ -741,20 +741,27 @@ const CREDIT = {
 function updateTerms() {
   const country = document.getElementById('f-country').value;
   const type = document.getElementById('f-accounttype').value;
+  const incoterm = document.getElementById('f-incoterm').value;
   const box = document.getElementById('terms-box');
   if (!country || !type) { box.classList.remove('visible'); return; }
   const t = TERMS[type]?.[country];
   if (!t) { box.classList.remove('visible'); return; }
+  const exworks = incoterm === 'EX Works';
   document.getElementById('terms-country-name').textContent = t.name;
   let html = '';
-  if (t.free) html += row('Freight free from', t.free);
-  if (t.below) html += row('Freight charge', t.below);
-  if (!t.free && !t.below) html += row('Freight', 'Quotation required');
-  html += row('Incoterms', t.inco);
-  if (t.fee) html += row('Mandatory fee', t.fee);
+  if (exworks) {
+    html += row('Incoterms', 'EX Works');
+    html += row('Freight', 'Customer collects — no freight charge');
+  } else {
+    if (t.free) html += row('Freight free from', t.free);
+    if (t.below) html += row('Freight charge', t.below);
+    if (!t.free && !t.below) html += row('Freight', 'Quotation required');
+    html += row('Incoterms', t.inco);
+    if (t.fee) html += row('Mandatory fee', t.fee);
+  }
   html += row('Cancellation', 'Production orders cancelled < 14 days before delivery: 100% charge');
   html += row('Credit terms', CREDIT[type]);
-  if (t.note) html += `<div class="terms-note">${t.note}</div>`;
+  if (t.note && !exworks) html += `<div class="terms-note">${t.note}</div>`;
   document.getElementById('terms-content').innerHTML = html;
   box.classList.add('visible');
 }
