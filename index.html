@@ -1,657 +1,925 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Padel-klubben</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      color: #e8f0e9; font-family: 'DM Sans', sans-serif; min-height: 100vh;
-      background-color: #0d2a1a;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px),
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 200px 200px, 200px 200px, 100px 100px, 100px 100px;
-      position: relative;
-    }
-    body::before {
-      content: ''; position: fixed; inset: 0;
-      background:
-        linear-gradient(to bottom, transparent 49%, rgba(255,255,255,0.08) 49%, rgba(255,255,255,0.08) 51%, transparent 51%),
-        linear-gradient(to right, transparent 49.5%, rgba(255,255,255,0.05) 49.5%, rgba(255,255,255,0.05) 50.5%, transparent 50.5%),
-        radial-gradient(ellipse at 50% 50%, rgba(15,60,30,0.7) 0%, rgba(8,20,12,0.92) 100%);
-      pointer-events: none; z-index: 0;
-    }
-    #root { position: relative; z-index: 1; }
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { opacity: 1; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #2a3a2d; border-radius: 3px; }
-    select option { background: #1a2e1e; color: #e8f0e9; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FDB Møbler — Wholesale Registration</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sand: #F2EEE8;
+  --sand-dark: #E8E2D9;
+  --oak: #B8956A;
+  --oak-dark: #9A7A55;
+  --charcoal: #1E1C1A;
+  --warm-grey: #6B6560;
+  --light-grey: #C8C3BC;
+  --border: #DDD8D0;
+  --white: #FFFFFF;
+  --success: #4A7C59;
+  --success-bg: #EEF4F0;
+  --info-bg: #F5F0E8;
+  --radius: 4px;
+}
+
+body { font-family: 'Inter', sans-serif; background: var(--sand); color: var(--charcoal); min-height: 100vh; line-height: 1.5; }
+
+header {
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 0 48px; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo-area { display: flex; align-items: center; gap: 14px; }
+.logo-box { width: 36px; height: 36px; background: var(--charcoal); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; letter-spacing: 0.05em; }
+.logo-text { display: flex; flex-direction: column; line-height: 1; }
+.logo-name { font-weight: 600; font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase; }
+.logo-sub { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-grey); margin-top: 3px; }
+.header-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--oak); background: var(--info-bg); border: 1px solid rgba(184,149,106,0.4); padding: 4px 10px; border-radius: 2px; }
+
+main { display: flex; min-height: calc(100vh - 64px); }
+
+.sidebar {
+  width: 280px; flex-shrink: 0; background: var(--charcoal);
+  padding: 44px 32px; position: sticky; top: 64px;
+  height: calc(100vh - 64px); overflow-y: auto; display: flex; flex-direction: column;
+}
+.sidebar-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; color: var(--white); line-height: 1.2; margin-bottom: 6px; }
+.sidebar-sub { font-size: 11.5px; color: var(--light-grey); line-height: 1.6; margin-bottom: 36px; }
+.steps-nav { display: flex; flex-direction: column; gap: 0; flex: 1; }
+.step-nav-item { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.07); cursor: pointer; opacity: 0.4; transition: opacity 0.2s; }
+.step-nav-item:last-child { border-bottom: none; }
+.step-nav-item.active { opacity: 1; }
+.step-nav-item.done { opacity: 0.55; }
+.step-nav-dot { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: all 0.2s; }
+.step-nav-item.active .step-nav-dot { background: var(--oak); border-color: var(--oak); }
+.step-nav-item.done .step-nav-dot { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); }
+.step-nav-dot span { font-size: 10px; font-weight: 600; color: white; }
+.step-nav-item.done .step-nav-dot span { display: none; }
+.step-nav-item.done .step-nav-dot::after { content: ''; width: 8px; height: 5px; border-left: 1.5px solid white; border-bottom: 1.5px solid white; transform: rotate(-45deg) translateY(-1px); display: block; }
+.step-nav-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: white; margin-bottom: 2px; }
+.step-nav-desc { font-size: 10.5px; color: var(--light-grey); line-height: 1.4; }
+.sidebar-footer { margin-top: auto; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: rgba(255,255,255,0.28); line-height: 1.7; }
+
+.content { flex: 1; padding: 48px; max-width: 720px; }
+.step { display: none; }
+.step.active { display: block; }
+
+.step-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--oak); margin-bottom: 8px; }
+.step-title { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; letter-spacing: -0.01em; color: var(--charcoal); margin-bottom: 6px; line-height: 1.1; }
+.step-desc { font-size: 13px; color: var(--warm-grey); margin-bottom: 32px; line-height: 1.6; }
+
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+.field-grid.single { grid-template-columns: 1fr; }
+.field-grid.thirds { grid-template-columns: 1fr 1fr 1fr; }
+.field { display: flex; flex-direction: column; }
+.field.span2 { grid-column: span 2; }
+.field.span3 { grid-column: span 3; }
+.field label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--warm-grey); margin-bottom: 7px; }
+.field input, .field select, .field textarea {
+  font-family: 'Inter', sans-serif; font-size: 13.5px; color: var(--charcoal);
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 10px 13px; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none; -webkit-appearance: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--oak); box-shadow: 0 0 0 3px rgba(184,149,106,0.12); }
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B6560' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer;
+}
+
+.field-hint { font-size: 11px; color: var(--light-grey); margin-top: 5px; line-height: 1.4; }
+
+.divider { display: flex; align-items: center; gap: 12px; margin: 28px 0 20px; }
+.divider span { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--warm-grey); white-space: nowrap; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Opening hours table */
+.hours-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+.hours-table th { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--warm-grey); padding: 8px 10px; text-align: left; background: var(--sand); border: 1px solid var(--border); }
+.hours-table td { padding: 0; border: 1px solid var(--border); }
+.hours-table td input { border: none; border-radius: 0; padding: 9px 10px; font-size: 13px; width: 100%; background: var(--white); }
+.hours-table td input:focus { box-shadow: inset 0 0 0 2px var(--oak); outline: none; }
+
+/* Trade Terms box */
+.terms-box { background: var(--info-bg); border: 1px solid rgba(184,149,106,0.5); border-radius: var(--radius); padding: 20px 22px; margin-top: 20px; display: none; }
+.terms-box.visible { display: block; }
+.terms-box-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.terms-box-header svg { width: 14px; height: 14px; stroke: var(--oak); flex-shrink: 0; }
+.terms-box-title { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--oak-dark); }
+.terms-country { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--charcoal); margin-bottom: 12px; }
+.terms-row { display: flex; gap: 8px; margin-bottom: 7px; font-size: 12.5px; line-height: 1.5; }
+.terms-row:last-of-type { margin-bottom: 0; }
+.terms-label { font-weight: 600; color: var(--charcoal); white-space: nowrap; min-width: 130px; }
+.terms-value { color: var(--warm-grey); }
+.terms-note { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(184,149,106,0.2); font-size: 11.5px; color: var(--warm-grey); font-style: italic; line-height: 1.5; }
+
+/* Upload */
+.upload-zone { border: 1.5px dashed var(--border); border-radius: var(--radius); background: var(--white); padding: 28px 24px; text-align: center; cursor: pointer; position: relative; transition: border-color 0.2s, background 0.2s; }
+.upload-zone:hover, .upload-zone.dragover { border-color: var(--oak); background: var(--info-bg); }
+.upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon-wrap { width: 38px; height: 38px; margin: 0 auto 12px; background: var(--sand); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.upload-icon-wrap svg { width: 17px; height: 17px; stroke: var(--oak); }
+.upload-main { font-size: 14px; font-weight: 500; color: var(--charcoal); margin-bottom: 4px; }
+.upload-sub { font-size: 11.5px; color: var(--warm-grey); }
+.file-list { margin-top: 12px; display: flex; flex-direction: column; gap: 7px; }
+.file-item { display: flex; align-items: center; gap: 10px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 13px; font-size: 12.5px; }
+.file-item svg { flex-shrink: 0; stroke: var(--oak); width: 15px; height: 15px; }
+.file-name { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-size { font-size: 11px; color: var(--warm-grey); white-space: nowrap; }
+.file-remove { background: none; border: none; cursor: pointer; color: var(--light-grey); padding: 2px 4px; display: flex; align-items: center; transition: color 0.15s; }
+.file-remove:hover { color: #8B3A2F; }
+.file-remove svg { width: 13px; height: 13px; stroke: currentColor; }
+
+/* Consent */
+.consent-block { background: var(--sand-dark); border-radius: var(--radius); padding: 16px 18px; margin: 24px 0 0; }
+.consent-row { display: flex; gap: 10px; align-items: flex-start; }
+.consent-row input[type="checkbox"] { width: 15px; height: 15px; margin-top: 2px; accent-color: var(--oak); cursor: pointer; flex-shrink: 0; }
+.consent-row label { font-size: 12.5px; color: var(--warm-grey); line-height: 1.55; cursor: pointer; }
+
+/* Newsletter row */
+.newsletter-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; }
+.newsletter-row input[type="checkbox"] { width: 15px; height: 15px; margin-top: 2px; accent-color: var(--oak); cursor: pointer; flex-shrink: 0; }
+.newsletter-row label { font-size: 12.5px; color: var(--warm-grey); line-height: 1.55; cursor: pointer; }
+
+/* Buttons */
+.btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; }
+.btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: none; border-radius: var(--radius); padding: 13px 28px; cursor: pointer; transition: all 0.15s; }
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--charcoal); color: white; }
+.btn-primary:hover { background: #2E2B28; }
+.btn-primary:disabled { background: var(--light-grey); cursor: not-allowed; transform: none; }
+.btn-ghost { background: transparent; color: var(--warm-grey); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: var(--charcoal); color: var(--charcoal); }
+
+.error-msg { background: #FDF0EE; border: 1px solid #C0392B; border-radius: var(--radius); padding: 12px 16px; margin-top: 16px; font-size: 13px; color: #8B3A2F; display: none; }
+.error-msg.visible { display: block; }
+
+/* Success */
+.success-screen { max-width: 460px; padding: 8px 0; }
+.success-icon-wrap { width: 50px; height: 50px; background: var(--success-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 22px; }
+.success-icon-wrap svg { width: 22px; height: 22px; stroke: var(--success); stroke-width: 2.5; }
+.success-title { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: var(--charcoal); margin-bottom: 12px; line-height: 1.1; }
+.success-text { font-size: 13.5px; color: var(--warm-grey); line-height: 1.7; margin-bottom: 24px; }
+.ref-box { display: inline-flex; align-items: center; gap: 10px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 18px; margin-bottom: 32px; }
+.ref-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--warm-grey); }
+.ref-value { font-size: 14px; font-weight: 600; color: var(--charcoal); letter-spacing: 0.05em; }
+.next-steps { background: var(--sand-dark); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 28px; }
+.next-steps-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--charcoal); margin-bottom: 10px; }
+.next-step-row { display: flex; gap: 10px; font-size: 12.5px; color: var(--warm-grey); margin-bottom: 6px; line-height: 1.5; }
+.next-step-row:last-child { margin-bottom: 0; }
+.next-step-n { font-weight: 700; color: var(--oak); flex-shrink: 0; }
+
+@media (max-width: 900px) {
+  main { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; padding: 24px; }
+  .steps-nav { flex-direction: row; overflow-x: auto; }
+  .step-nav-item { flex-direction: column; align-items: center; text-align: center; padding: 10px 8px; border-bottom: none; border-right: 1px solid rgba(255,255,255,0.07); min-width: 70px; }
+  .step-nav-item:last-child { border-right: none; }
+  .step-nav-desc, .sidebar-footer, .sidebar-sub { display: none; }
+  .content { padding: 28px 20px; }
+  .field-grid, .field-grid.thirds { grid-template-columns: 1fr; }
+  .field.span2, .field.span3 { grid-column: span 1; }
+}
+</style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-  const { useState, useEffect, useRef } = React;
 
-  // ── Supabase ────────────────────────────────────────────────────────────
-  const SUPABASE_URL = "https://nnasbmcozkzjrpczjwpg.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uYXNibWNvemt6anJwY3pqd3BnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMTc3MTcsImV4cCI6MjA5Nzc5MzcxN30.Eb8v72UVl5cuHcAcfsFSxwjmjMI3ezLRvGwl-HLw3dQ";
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+<header>
+  <div class="logo-area">
+    <img src="data:image/png;base64,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" alt="FDB Møbler" style="height:40px; width:auto; filter:invert(1);" />
+  </div>
+  <div class="header-tag">Wholesale B2B</div>
+</header>
 
-  const KNOWN_PLAYERS = ["Mikkel", "Niko", "Roller", "Oli"];
-  const VENUES = ["Albertslund (udendørs)", "Taastrup (udendørs)", "Hedehusene (udendørs)", "Indendørs"];
-
-  const C = {
-    bg: "transparent", surface: "rgba(10,28,16,0.85)", border: "rgba(255,255,255,0.09)",
-    accent: "#7FFF6E", accentDim: "rgba(127,255,110,0.12)",
-    red: "#FF5C5C", gold: "#FFD166", muted: "#4a5a4f", text: "#e8f0e9", sub: "#6b7d6e",
-  };
-
-  // ── Americano logic ─────────────────────────────────────────────────────
-  function generateRounds(players) {
-    const n = players.length;
-    if (n < 4 || n % 2 !== 0) return [];
-    const arr = [...players];
-    const rounds = [];
-    const maxRounds = Math.min(n - 1, 3);
-    for (let r = 0; r < maxRounds; r++) {
-      const pairs = [];
-      for (let i = 0; i < n / 2; i++) pairs.push([arr[i], arr[n - 1 - i]]);
-      const courts = [];
-      for (let i = 0; i < pairs.length; i += 2)
-        if (pairs[i + 1]) courts.push({ team1: pairs[i], team2: pairs[i + 1], score1: "", score2: "" });
-      rounds.push(courts);
-      const last = arr.pop();
-      arr.splice(1, 0, last);
-    }
-    return rounds;
-  }
-
-  function calcStandings(players, rounds) {
-    const pts = {};
-    players.forEach(p => (pts[p] = 0));
-    rounds.forEach(round => round.forEach(court => {
-      const s1 = parseInt(court.score1), s2 = parseInt(court.score2);
-      if (!isNaN(s1) && !isNaN(s2) && s1 + s2 === 24) {
-        court.team1.forEach(p => (pts[p] = (pts[p] || 0) + s1));
-        court.team2.forEach(p => (pts[p] = (pts[p] || 0) + s2));
-      }
-    }));
-    return Object.entries(pts).sort((a, b) => b[1] - a[1]);
-  }
-
-  function calcAllTime(tournaments) {
-    const pts = {}, played = {}, wins = {};
-    KNOWN_PLAYERS.forEach(p => { pts[p] = 0; played[p] = 0; wins[p] = 0; });
-    tournaments.forEach(t => {
-      t.rounds.forEach(round => round.forEach(court => {
-        const s1 = parseInt(court.score1), s2 = parseInt(court.score2);
-        if (!isNaN(s1) && !isNaN(s2) && s1 + s2 === 24) {
-          court.team1.forEach(p => { pts[p] = (pts[p]||0)+s1; played[p]=(played[p]||0)+1; if(s1>s2) wins[p]=(wins[p]||0)+1; });
-          court.team2.forEach(p => { pts[p] = (pts[p]||0)+s2; played[p]=(played[p]||0)+1; if(s2>s1) wins[p]=(wins[p]||0)+1; });
-        }
-      }));
-    });
-    tournaments.forEach(t => t.players.forEach(p => { if(!(p in pts)){pts[p]=0;played[p]=0;wins[p]=0;} }));
-    return Object.entries(pts)
-      .map(([name, total]) => ({ name, total, played: played[name]||0, wins: wins[name]||0, avg: played[name] ? (total/played[name]).toFixed(1) : "—" }))
-      .sort((a, b) => b.total - a.total);
-  }
-
-  // ── UI helpers ──────────────────────────────────────────────────────────
-  const Mono = ({ children, style }) => <span style={{ fontFamily: "'DM Mono', monospace", ...style }}>{children}</span>;
-  const Tag = ({ children, color = C.accent }) => (
-    <span style={{ background: `${color}22`, color, border: `1px solid ${color}44`, borderRadius: 5, padding: "2px 8px", fontSize: 11, fontFamily: "'DM Mono', monospace", letterSpacing: 0.5 }}>{children}</span>
-  );
-  const Btn = ({ children, onClick, disabled, variant = "primary", small }) => (
-    <button onClick={onClick} disabled={disabled} style={{
-      background: disabled ? "#1e2a22" : variant === "primary" ? C.accent : variant === "danger" ? C.red : "rgba(255,255,255,0.06)",
-      color: disabled ? C.muted : variant === "primary" ? "#0b1a0d" : "#fff",
-      border: "none", borderRadius: 10, cursor: disabled ? "not-allowed" : "pointer",
-      padding: small ? "8px 16px" : "13px 20px",
-      fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: small ? 12 : 14, transition: "all 0.15s", letterSpacing: 0.3,
-    }}>{children}</button>
-  );
-  const Input = ({ value, onChange, placeholder, type = "text", style, onKeyDown }) => (
-    <input type={type} value={value} placeholder={placeholder} onChange={e => onChange(e.target.value)} onKeyDown={onKeyDown}
-      style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 14px", color: C.text, fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: "none", width: "100%", boxSizing: "border-box", colorScheme: "dark", ...style }} />
-  );
-  const Select = ({ value, onChange, children }) => (
-    <select value={value} onChange={e => onChange(e.target.value)}
-      style={{ background: "rgba(10,28,16,0.95)", border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 14px", color: value ? C.text : C.sub, fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: "none", width: "100%", boxSizing: "border-box", colorScheme: "dark", cursor: "pointer" }}>
-      {children}
-    </select>
-  );
-  const Field = ({ label, children }) => (
-    <div>
-      <p style={{ margin: "0 0 7px", fontSize: 11, color: C.sub, fontFamily: "'DM Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>{label}</p>
-      {children}
+<main>
+  <aside class="sidebar">
+    <div class="sidebar-title">Customer<br>Registration</div>
+    <div class="sidebar-sub">Complete all steps — we'll process your account within 1–2 business days.</div>
+    <nav class="steps-nav">
+      <div class="step-nav-item active" id="nav-1" onclick="goStep(1)">
+        <div class="step-nav-dot"><span>1</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Account</div>
+          <div class="step-nav-desc">Type & agent info</div>
+        </div>
+      </div>
+      <div class="step-nav-item" id="nav-2" onclick="goStep(2)">
+        <div class="step-nav-dot"><span>2</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Contact</div>
+          <div class="step-nav-desc">Company & people</div>
+        </div>
+      </div>
+      <div class="step-nav-item" id="nav-3" onclick="goStep(3)">
+        <div class="step-nav-dot"><span>3</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Addresses</div>
+          <div class="step-nav-desc">Invoice & delivery</div>
+        </div>
+      </div>
+      <div class="step-nav-item" id="nav-4" onclick="goStep(4)">
+        <div class="step-nav-dot"><span>4</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Delivery</div>
+          <div class="step-nav-desc">Hours & logistics</div>
+        </div>
+      </div>
+      <div class="step-nav-item" id="nav-5" onclick="goStep(5)">
+        <div class="step-nav-dot"><span>5</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Trade Terms</div>
+          <div class="step-nav-desc">Market & terms</div>
+        </div>
+      </div>
+      <div class="step-nav-item" id="nav-6" onclick="goStep(6)">
+        <div class="step-nav-dot"><span>6</span></div>
+        <div class="step-nav-content">
+          <div class="step-nav-label">Documents</div>
+          <div class="step-nav-desc">Files & submit</div>
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      Submitted to<br>Mikkel Pedersen · FDB Møbler A/S<br><br>
+      Questions? order@fdbmobler.dk<br>
+      +45 43 86 29 30
     </div>
-  );
-  const BackBtn = ({ onClick }) => (
-    <button onClick={onClick} style={{ background: "none", border: "none", color: C.sub, cursor: "pointer", fontSize: 14, padding: 0, display: "flex", alignItems: "center", gap: 6, fontFamily: "'DM Mono', monospace" }}>← Tilbage</button>
-  );
+  </aside>
 
-  function Section({ title, children }) {
-    return (
-      <div style={{ marginBottom: 28 }}>
-        <p style={{ fontSize: 10, color: C.sub, fontFamily: "'DM Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>{title}</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>{children}</div>
+  <div class="content">
+
+    <!-- STEP 1: ACCOUNT SETUP -->
+    <div class="step active" id="step-1">
+      <div class="step-eyebrow">Step 1 of 6</div>
+      <div class="step-title">Account Setup</div>
+      <div class="step-desc">Basic account settings — to be filled out by the agent.</div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label>Customer Group *</label>
+          <select id="f-customergroup">
+            <option value="">Select…</option>
+            <option>WHOLESALE DENMARK</option>
+            <option>WHOLESALE NO/SE</option>
+            <option>EXPORT WS/CONTRACT (all other markets than DK/SE/NO)</option>
+            <option>CONTRACT SCANDINAVIA (Contract dealer DK/SE/NO)</option>
+            <option>B2B-GIFT</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Type of Business *</label>
+          <select id="f-businesstype">
+            <option value="">Select…</option>
+            <option>WS_RETAIL — Sale through retailer stores only</option>
+            <option>WS_ONLINE — Online sales through website only</option>
+            <option>WS_OMNICHANNEL — Both stores and online</option>
+            <option>WS_CHAIN — Sales through a chain of retail stores</option>
+            <option>ARCHITECT — Architects, freelancers for projects</option>
+            <option>CONTRACT PROJECT DEALER — Contract dealers on projects</option>
+            <option>CONTRACT END-USER — Direct sales to companies</option>
+            <option>B2B-GIFT — Gift dealer</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Currency *</label>
+          <select id="f-currency">
+            <option value="">Select…</option>
+            <option>DKK</option>
+            <option>EUR</option>
+            <option>GBP</option>
+            <option>NOK</option>
+            <option>SEK</option>
+            <option>USD</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Discount Agreement %</label>
+          <input type="number" id="f-discount" placeholder="e.g. 40" min="0" max="100" step="1" />
+        </div>
+        <div class="field">
+          <label>Agent</label>
+          <input type="text" id="f-agent" placeholder="Agent name" />
+        </div>
+        <div class="field">
+          <label>Language</label>
+          <select id="f-language">
+            <option value="">Select…</option>
+            <option>EN</option>
+            <option>DK</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="f-date" />
+        </div>
       </div>
-    );
-  }
 
-  // ── Loading / Error ─────────────────────────────────────────────────────
-  function LoadingScreen() {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", gap: 16 }}>
-        <div style={{ fontSize: 48 }}>🎾</div>
-        <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, letterSpacing: 2, color: C.accent }}>Henter data...</p>
+      <div class="divider"><span>Newsletter Subscription</span></div>
+      <div class="field-grid single">
+        <div class="field">
+          <label>Newsletter Email(s)</label>
+          <input type="text" id="f-newsletter-email" placeholder="email@company.com (separate multiple with comma)" />
+          <span class="field-hint">Sign up for newsletters, price lists and campaign lists by email.</span>
+        </div>
       </div>
-    );
-  }
-
-  function ErrorBanner({ msg }) {
-    return (
-      <div style={{ background: "rgba(255,92,92,0.15)", border: `1px solid ${C.red}44`, borderRadius: 10, padding: "12px 16px", margin: "0 20px 16px", color: C.red, fontSize: 13, fontFamily: "'DM Mono', monospace" }}>
-        ⚠ {msg}
+      <div class="newsletter-row">
+        <input type="checkbox" id="f-newsletter-accept" />
+        <label for="f-newsletter-accept">Customer accepts to receive newsletters, price lists and campaign emails from FDB Møbler.</label>
       </div>
-    );
-  }
 
-  // ── Reset modal ─────────────────────────────────────────────────────────
-  function ResetModal({ onConfirm, onCancel }) {
-    return (
-      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-        <div style={{ background: "#0f2018", border: `1px solid ${C.red}44`, borderRadius: 20, padding: "32px 24px", maxWidth: 360, width: "100%", textAlign: "center" }}>
-          <div style={{ fontSize: 44, marginBottom: 12 }}>⚠️</div>
-          <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, letterSpacing: 2, color: C.red, marginBottom: 10 }}>NULSTIL TURNERING?</h3>
-          <p style={{ color: C.sub, fontSize: 14, lineHeight: 1.6, marginBottom: 28 }}>
-            Dette sletter <strong style={{ color: C.text }}>alle turneringer og scores</strong> permanent og starter en helt ny sæson. Dette kan ikke fortrydes.
-          </p>
-          <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={onCancel} style={{ flex: 1, padding: "13px 0", background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, borderRadius: 10, color: C.text, fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>Annuller</button>
-            <button onClick={onConfirm} style={{ flex: 1, padding: "13px 0", background: C.red, border: "none", borderRadius: 10, color: "#fff", fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>Ja, nulstil</button>
+      <div class="btn-row">
+        <span></span>
+        <button class="btn btn-primary" onclick="goStep(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: CONTACT INFORMATION -->
+    <div class="step" id="step-2">
+      <div class="step-eyebrow">Step 2 of 6</div>
+      <div class="step-title">Contact Information</div>
+      <div class="step-desc">To be filled out by the customer.</div>
+
+      <div class="field-grid">
+        <div class="field span2">
+          <label>Company Name *</label>
+          <input type="text" id="f-company" placeholder="Company name" />
+        </div>
+        <div class="field">
+          <label>VAT No.</label>
+          <input type="text" id="f-vat" placeholder="e.g. DK12345678" />
+        </div>
+        <div class="field">
+          <label>SAFE No.</label>
+          <input type="text" id="f-safe" placeholder="SAFE number" />
+        </div>
+        <div class="field">
+          <label>EAN No.</label>
+          <input type="text" id="f-ean" placeholder="EAN number" />
+        </div>
+        <div class="field">
+          <label>EORI No. <span style="font-weight:400;text-transform:none;letter-spacing:0">(UK customers)</span></label>
+          <input type="text" id="f-eori" placeholder="EORI number" />
+        </div>
+      </div>
+
+      <div class="divider"><span>Primary Contact Person</span></div>
+      <div class="field-grid">
+        <div class="field span2">
+          <label>Contact Person *</label>
+          <input type="text" id="f-contact-name" placeholder="Full name" />
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="tel" id="f-contact-phone" placeholder="+45 20 20 20 20" />
+        </div>
+        <div class="field">
+          <label>Email — Contact Person *</label>
+          <input type="email" id="f-contact-email" placeholder="contact@company.com" />
+        </div>
+      </div>
+
+      <div class="divider"><span>Email Addresses</span></div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Email — Order Confirmations</label>
+          <input type="email" id="f-email-orders" placeholder="orders@company.com" />
+        </div>
+        <div class="field">
+          <label>Email — Delivery Notes</label>
+          <input type="email" id="f-email-delivery" placeholder="warehouse@company.com" />
+        </div>
+        <div class="field">
+          <label>Email — Invoices</label>
+          <input type="email" id="f-email-invoice" placeholder="invoice@company.com" />
+        </div>
+        <div class="field">
+          <label>Email — Credit Notes / Statements</label>
+          <input type="email" id="f-email-credit" placeholder="finance@company.com" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: ADDRESSES -->
+    <div class="step" id="step-3">
+      <div class="step-eyebrow">Step 3 of 6</div>
+      <div class="step-title">Addresses</div>
+      <div class="step-desc">Invoice and delivery addresses for your account.</div>
+
+      <div class="divider" style="margin-top:0"><span>Invoice Address</span></div>
+      <div class="field-grid">
+        <div class="field span2">
+          <label>Company Name</label>
+          <input type="text" id="f-inv-company" placeholder="Company name on invoice" />
+        </div>
+        <div class="field span2">
+          <label>Street Name</label>
+          <input type="text" id="f-inv-street" placeholder="Street name and number" />
+        </div>
+        <div class="field">
+          <label>Zip Code</label>
+          <input type="text" id="f-inv-zip" placeholder="Postal code" />
+        </div>
+        <div class="field">
+          <label>City</label>
+          <input type="text" id="f-inv-city" placeholder="City" />
+        </div>
+        <div class="field">
+          <label>State / Region</label>
+          <input type="text" id="f-inv-state" placeholder="State or region" />
+        </div>
+        <div class="field">
+          <label>Country</label>
+          <input type="text" id="f-inv-country" placeholder="Country" />
+        </div>
+      </div>
+
+      <div class="divider"><span>Delivery Address</span></div>
+      <div class="field-grid">
+        <div class="field span2">
+          <label>Company Name</label>
+          <input type="text" id="f-del-company" placeholder="Company name for delivery" />
+        </div>
+        <div class="field span2">
+          <label>Street Name</label>
+          <input type="text" id="f-del-street" placeholder="Street name and number" />
+        </div>
+        <div class="field">
+          <label>Zip Code</label>
+          <input type="text" id="f-del-zip" placeholder="Postal code" />
+        </div>
+        <div class="field">
+          <label>City</label>
+          <input type="text" id="f-del-city" placeholder="City" />
+        </div>
+        <div class="field">
+          <label>State / Region</label>
+          <input type="text" id="f-del-state" placeholder="State or region" />
+        </div>
+        <div class="field">
+          <label>Country</label>
+          <input type="text" id="f-del-country" placeholder="Country" />
+        </div>
+        <div class="field">
+          <label>Contact Person — Delivery</label>
+          <input type="text" id="f-del-contact" placeholder="Name" />
+        </div>
+        <div class="field">
+          <label>Phone — Delivery</label>
+          <input type="tel" id="f-del-phone" placeholder="+45 20 20 20 20" />
+        </div>
+        <div class="field span2">
+          <label>Email — Delivery Contact</label>
+          <input type="email" id="f-del-email" placeholder="delivery@company.com" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(4)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: DELIVERY DETAILS -->
+    <div class="step" id="step-4">
+      <div class="step-eyebrow">Step 4 of 6</div>
+      <div class="step-title">Delivery Details</div>
+      <div class="step-desc">Logistics information to ensure smooth deliveries to your location.</div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label>Able to Deliver with Big Truck? *</label>
+          <select id="f-bigtruck">
+            <option value="">Select…</option>
+            <option>Yes</option>
+            <option>No — Additional fee will be added on orders</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Mandatory Slot Time / Fixed Delivery Booking?</label>
+          <select id="f-slottime">
+            <option value="">Select…</option>
+            <option>No</option>
+            <option>Yes — Additional fee will be added on orders</option>
+          </select>
+        </div>
+        <div class="field span2">
+          <label>Additional Delivery Information</label>
+          <textarea id="f-del-info" placeholder="Any special requirements, access restrictions, packaging return, etc."></textarea>
+        </div>
+        <div class="field span2">
+          <label>Delivery Comments</label>
+          <textarea id="f-del-comments" placeholder="Other delivery comments…"></textarea>
+        </div>
+      </div>
+
+      <div class="divider"><span>Opening Hours for Delivery (weekdays only)</span></div>
+      <table class="hours-table">
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>From</th>
+            <th>To</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:9px 10px;font-size:13px;font-weight:500;background:var(--sand);border:1px solid var(--border)">Monday</td><td><input type="time" id="f-mon-from" /></td><td><input type="time" id="f-mon-to" /></td></tr>
+          <tr><td style="padding:9px 10px;font-size:13px;font-weight:500;background:var(--sand);border:1px solid var(--border)">Tuesday</td><td><input type="time" id="f-tue-from" /></td><td><input type="time" id="f-tue-to" /></td></tr>
+          <tr><td style="padding:9px 10px;font-size:13px;font-weight:500;background:var(--sand);border:1px solid var(--border)">Wednesday</td><td><input type="time" id="f-wed-from" /></td><td><input type="time" id="f-wed-to" /></td></tr>
+          <tr><td style="padding:9px 10px;font-size:13px;font-weight:500;background:var(--sand);border:1px solid var(--border)">Thursday</td><td><input type="time" id="f-thu-from" /></td><td><input type="time" id="f-thu-to" /></td></tr>
+          <tr><td style="padding:9px 10px;font-size:13px;font-weight:500;background:var(--sand);border:1px solid var(--border)">Friday</td><td><input type="time" id="f-fri-from" /></td><td><input type="time" id="f-fri-to" /></td></tr>
+        </tbody>
+      </table>
+      <p class="field-hint" style="margin-top:10px">Standard delivery unless otherwise agreed. Extra fees may apply for missed deliveries, incorrect addresses or special truck requirements.</p>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(5)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: TRADE TERMS -->
+    <div class="step" id="step-5">
+      <div class="step-eyebrow">Step 5 of 6</div>
+      <div class="step-title">Market & Trade Terms</div>
+      <div class="step-desc">Select the customer's country and account type — applicable trade terms appear automatically.</div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label>Country / Market *</label>
+          <select id="f-country" onchange="updateTerms()">
+            <option value="">Select country…</option>
+            <optgroup label="Scandinavia">
+              <option value="DK">Denmark (DK)</option>
+              <option value="FO">Faroe Islands (FO)</option>
+              <option value="NO">Norway (NO)</option>
+              <option value="SE">Sweden (SE)</option>
+            </optgroup>
+            <optgroup label="Northern Europe">
+              <option value="FI">Finland (FI)</option>
+            </optgroup>
+            <optgroup label="Central Europe">
+              <option value="DE">Germany (DE)</option>
+              <option value="FR">France (FR)</option>
+              <option value="NL">Netherlands (NL)</option>
+              <option value="BE">Belgium (BE)</option>
+              <option value="LU">Luxembourg (LU)</option>
+            </optgroup>
+            <optgroup label="British Isles">
+              <option value="GB">United Kingdom (GB)</option>
+            </optgroup>
+            <optgroup label="Other Markets">
+              <option value="OTHER">Other market</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field">
+          <label>Account Type *</label>
+          <select id="f-accounttype" onchange="updateTerms()">
+            <option value="">Select…</option>
+            <option value="wholesale">Wholesale (Retail)</option>
+            <option value="contract">Contract / B2B</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Preferred Incoterm</label>
+          <select id="f-incoterm" onchange="updateTerms()">
+            <option value="">Select…</option>
+            <option>DAP (Delivered at Place)</option>
+            <option>EX Works</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="terms-box" id="terms-box">
+        <div class="terms-box-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span class="terms-box-title">Trade Terms — SS2026</span>
+        </div>
+        <div class="terms-country" id="terms-country-name"></div>
+        <div id="terms-content"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(6)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: DOCUMENTS & SUBMIT -->
+    <div class="step" id="step-6">
+      <div class="step-eyebrow">Step 6 of 6</div>
+      <div class="step-title">Documents & Submit</div>
+      <div class="step-desc">Upload any relevant files, then submit the registration to Mikkel Pedersen.</div>
+
+      <div class="upload-zone" id="upload-zone"
+        ondragover="handleDragOver(event)"
+        ondragleave="handleDragLeave(event)"
+        ondrop="handleDrop(event)">
+        <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.xlsx,.xls" onchange="handleFiles(this.files)" />
+        <div class="upload-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="upload-main">Drag files here or click to browse</div>
+        <div class="upload-sub">PDF, Word, Excel, images · Optional</div>
+      </div>
+      <div class="file-list" id="file-list"></div>
+
+      <div class="consent-block">
+        <div class="consent-row">
+          <input type="checkbox" id="consent" />
+          <label for="consent">I confirm that the information provided is accurate, and I agree that FDB Møbler A/S may store and process this data in accordance with GDPR and applicable privacy policy. The customer acknowledges the trade terms for their market.</label>
+        </div>
+      </div>
+
+      <div style="font-size:11.5px; color:var(--warm-grey); margin-top:14px; line-height:1.6;">
+        This form will be submitted to <strong style="color:var(--charcoal)">Mikkel Pedersen</strong> · Mikkel.pedersen@fdbmobler.dk
+      </div>
+
+      <div class="error-msg" id="error-msg">
+        Something went wrong. Please try again or contact us at order@fdbmobler.dk
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(5)">← Back</button>
+        <button class="btn btn-primary" id="submit-btn" onclick="submitForm()">Submit Registration</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="step" id="step-success">
+      <div class="success-screen">
+        <div class="success-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="step-eyebrow">Received</div>
+        <div class="success-title">Registration<br>submitted</div>
+        <div class="success-text">The customer registration has been sent to Mikkel Pedersen at FDB Møbler. A confirmation email will follow, and the account will be processed within 1–2 business days.</div>
+        <div class="ref-box">
+          <span class="ref-label">Reference</span>
+          <span class="ref-value" id="ref-number">FDB-XXXXX</span>
+        </div>
+        <div class="next-steps">
+          <div class="next-steps-title">What happens next</div>
+          <div class="next-step-row"><span class="next-step-n">1.</span> A confirmation email is sent with the reference number.</div>
+          <div class="next-step-row"><span class="next-step-n">2.</span> The sales team reviews and sets up the account in the system.</div>
+          <div class="next-step-row"><span class="next-step-n">3.</span> The customer gains access to the B2B portal at btb.fdbmobler.dk</div>
+        </div>
+        <button class="btn btn-ghost" onclick="resetForm()">Register another customer</button>
+
+        <div style="margin-top:28px; padding-top:24px; border-top:1px solid var(--border);">
+          <div style="font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--warm-grey); margin-bottom:14px;">Catalogues</div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="https://viewer.ipaper.io/fdb-moebler/pricelist/?page=1" target="_blank" class="btn btn-ghost" style="text-decoration:none;">
+              SS2026 Pricelist ↗
+            </a>
+            <a href="https://viewer.ipaper.io/fdb-moebler/contract-collection/?page=1" target="_blank" class="btn btn-ghost" style="text-decoration:none;">
+              Contract Catalogue ↗
+            </a>
           </div>
         </div>
       </div>
-    );
+    </div>
+
+  </div>
+</main>
+
+<script>
+let currentStep = 1;
+let uploadedFiles = [];
+
+const TERMS = {
+  wholesale: {
+    DK:    { name:'Denmark (DK / FO)',    free:'7,500 DKK',  below:'500 DKK',   inco:'DAP / EX Works', fee:null,                            note:'Orders via order@fdbmobler.dk or btb.fdbmobler.dk' },
+    FO:    { name:'Faroe Islands (FO)',   free:'7,500 DKK',  below:'500 DKK',   inco:'DAP / EX Works', fee:null,                            note:null },
+    NO:    { name:'Norway (NO)',          free:'10,000 NOK', below:'1,000 NOK', inco:'DAP / EX Works', fee:'400 NOK (customs, mandatory)',   note:null },
+    SE:    { name:'Sweden (SE)',          free:'10,000 SEK', below:'1,000 SEK', inco:'DAP / EX Works', fee:null,                            note:null },
+    FI:    { name:'Finland (FI)',         free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    DE:    { name:'Germany (DE)',         free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    FR:    { name:'France (FR)',          free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    NL:    { name:'Benelux (NL/BE/LU)',   free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    BE:    { name:'Benelux (NL/BE/LU)',   free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    LU:    { name:'Benelux (NL/BE/LU)',   free:'1,000 EUR',  below:'100 EUR',   inco:'DAP / EX Works', fee:null,                            note:null },
+    GB:    { name:'United Kingdom (GB)',  free:'1,000 GBP',  below:'100 GBP',   inco:'DAP / EX Works', fee:'45 GBP (Brexit fee, mandatory)', note:null },
+    OTHER: { name:'Other Markets',        free:null,         below:null,        inco:'DAP / EX Works', fee:'45 EUR (non-EU countries)',     note:'Freight quotation required — contact order@fdbmobler.dk' },
+  },
+  contract: {
+    DK:    { name:'Denmark (DK / FO)',    free:null, below:'Below 7,500 DKK: 500 DKK fee · Above: 6% of order value',           inco:'DAP / EX Works', fee:null,                            note:'Via order@fdbmobler.dk or responsible contract person' },
+    FO:    { name:'Faroe Islands (FO)',   free:null, below:'Below 7,500 DKK: 500 DKK fee · Above: 6% of order value',           inco:'DAP / EX Works', fee:null,                            note:null },
+    NO:    { name:'Norway (NO)',          free:null, below:'Below 10,000 NOK: 1,000 NOK fee · Above: 6% of order value',        inco:'DAP / EX Works', fee:'400 NOK (customs, mandatory)',   note:null },
+    SE:    { name:'Sweden (SE)',          free:null, below:'Below 10,000 SEK: 1,000 SEK fee · Above: 6% of order value',       inco:'DAP / EX Works', fee:null,                            note:null },
+    FI:    { name:'Finland (FI)',         free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 1,000 EUR: 6% of order value', inco:'DAP / EX Works', fee:null,                           note:null },
+    DE:    { name:'Germany (DE)',         free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 1,000 EUR: 6% of order value', inco:'DAP / EX Works', fee:null,                           note:null },
+    FR:    { name:'France (FR)',          free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 1,000 EUR: 6% of order value', inco:'DAP / EX Works', fee:null,                           note:null },
+    NL:    { name:'Benelux (NL/BE/LU)',   free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 1,000 EUR: 6% of order value',  inco:'DAP / EX Works', fee:null,                           note:null },
+    BE:    { name:'Benelux (NL/BE/LU)',   free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 1,000 EUR: 6% of order value',  inco:'DAP / EX Works', fee:null,                           note:null },
+    LU:    { name:'Benelux (NL/BE/LU)',   free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 1,000 EUR: 6% of order value',  inco:'DAP / EX Works', fee:null,                           note:null },
+    GB:    { name:'United Kingdom (GB)',  free:null, below:'Below 1,000 GBP: 100 GBP fee · Above 1,000 GBP: 6% of order value', inco:'DAP / EX Works', fee:'45 GBP (Brexit fee, mandatory)', note:null },
+    OTHER: { name:'Other Markets',        free:null, below:null, inco:'DAP / EX Works', fee:'45 EUR (non-EU countries)', note:'Freight quotation required. Credit: prepayment unless otherwise agreed.' },
+  }
+};
+
+const CREDIT = {
+  wholesale: 'New customers: prepayment on first order. Credit limit up to 35,000 EUR / 250,000 DKK / 325,000 SEK/NOK.',
+  contract:  'Prepayment on all orders unless otherwise agreed.'
+};
+
+function updateTerms() {
+  const country = document.getElementById('f-country').value;
+  const type = document.getElementById('f-accounttype').value;
+  const incoterm = document.getElementById('f-incoterm').value;
+  const box = document.getElementById('terms-box');
+  if (!country || !type) { box.classList.remove('visible'); return; }
+  const t = TERMS[type]?.[country];
+  if (!t) { box.classList.remove('visible'); return; }
+  const exworks = incoterm === 'EX Works';
+  document.getElementById('terms-country-name').textContent = t.name;
+  let html = '';
+  if (exworks) {
+    html += row('Incoterms', 'EX Works');
+    html += row('Freight', 'Customer collects — no freight charge');
+  } else {
+    if (t.free) html += row('Freight free from', t.free);
+    if (t.below) html += row('Freight charge', t.below);
+    if (!t.free && !t.below) html += row('Freight', 'Quotation required');
+    html += row('Incoterms', t.inco);
+    if (t.fee) html += row('Mandatory fee', t.fee);
+  }
+  html += row('Cancellation', 'Production orders cancelled < 14 days before delivery: 100% charge');
+  html += row('Credit terms', CREDIT[type]);
+  if (t.note && !exworks) html += `<div class="terms-note">${t.note}</div>`;
+  document.getElementById('terms-content').innerHTML = html;
+  box.classList.add('visible');
+}
+
+
+function row(label, value) {
+  return `<div class="terms-row"><span class="terms-label">${label}</span><span class="terms-value">${value}</span></div>`;
+}
+
+function goStep(n) {
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  document.getElementById('step-' + n).classList.add('active');
+  for (let i = 1; i <= 6; i++) {
+    const nav = document.getElementById('nav-' + i);
+    if (!nav) continue;
+    nav.className = 'step-nav-item';
+    if (i < n) nav.classList.add('done');
+    else if (i === n) nav.classList.add('active');
+  }
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function sel(id) { const el = document.getElementById(id); return el?.options[el.selectedIndex]?.text || ''; }
+function checked(id) { return document.getElementById(id)?.checked ? 'Yes' : 'No'; }
+
+function handleFiles(files) {
+  for (const f of files) { if (!uploadedFiles.find(x => x.name === f.name)) uploadedFiles.push(f); }
+  renderFileList();
+}
+function fileHTML(name, size, removable, idx) {
+  const kb = size < 1048576 ? Math.round(size/1024) + ' KB' : (size/1048576).toFixed(1) + ' MB';
+  return `<div class="file-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span class="file-name">${name}</span><span class="file-size">${kb}</span>
+    ${removable ? `<button class="file-remove" onclick="removeFile(${idx})"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
+  </div>`;
+}
+function renderFileList() { document.getElementById('file-list').innerHTML = uploadedFiles.map((f,i) => fileHTML(f.name, f.size, true, i)).join(''); }
+function removeFile(i) { uploadedFiles.splice(i, 1); renderFileList(); }
+function handleDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('dragover'); }
+function handleDragLeave() { document.getElementById('upload-zone').classList.remove('dragover'); }
+function handleDrop(e) { e.preventDefault(); document.getElementById('upload-zone').classList.remove('dragover'); handleFiles(e.dataTransfer.files); }
+
+async function submitForm() {
+  const consent = document.getElementById('consent');
+  if (!consent.checked) {
+    consent.style.outline = '2px solid #8B3A2F';
+    setTimeout(() => consent.style.outline = '', 2500);
+    return;
+  }
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  document.getElementById('error-msg').classList.remove('visible');
+
+  const formData = new FormData();
+  formData.append('_subject', 'New Customer Registration — FDB Møbler B2B Portal');
+
+  // Step 1 — Account setup
+  formData.append('Date',               v('f-date'));
+  formData.append('Customer Group',     sel('f-customergroup'));
+  formData.append('Type of Business',   sel('f-businesstype'));
+  formData.append('Currency',           sel('f-currency'));
+  formData.append('Discount %',         v('f-discount'));
+  formData.append('Agent',              v('f-agent'));
+  formData.append('Language',           sel('f-language'));
+  formData.append('Newsletter Email',   v('f-newsletter-email'));
+  formData.append('Newsletter Accept',  checked('f-newsletter-accept'));
+
+  // Step 2 — Contact
+  formData.append('Company Name',               v('f-company'));
+  formData.append('VAT No.',                    v('f-vat'));
+  formData.append('SAFE No.',                   v('f-safe'));
+  formData.append('EAN No.',                    v('f-ean'));
+  formData.append('EORI No.',                   v('f-eori'));
+  formData.append('Contact Person',             v('f-contact-name'));
+  formData.append('Phone — Contact',            v('f-contact-phone'));
+  formData.append('Email — Contact',            v('f-contact-email'));
+  formData.append('Email — Order Confirmations',v('f-email-orders'));
+  formData.append('Email — Delivery Notes',     v('f-email-delivery'));
+  formData.append('Email — Invoices',           v('f-email-invoice'));
+  formData.append('Email — Credit Notes',       v('f-email-credit'));
+
+  // Step 3 — Addresses
+  formData.append('Invoice — Company',   v('f-inv-company'));
+  formData.append('Invoice — Street',    v('f-inv-street'));
+  formData.append('Invoice — Zip',       v('f-inv-zip'));
+  formData.append('Invoice — City',      v('f-inv-city'));
+  formData.append('Invoice — State',     v('f-inv-state'));
+  formData.append('Invoice — Country',   v('f-inv-country'));
+  formData.append('Delivery — Company',  v('f-del-company'));
+  formData.append('Delivery — Street',   v('f-del-street'));
+  formData.append('Delivery — Zip',      v('f-del-zip'));
+  formData.append('Delivery — City',     v('f-del-city'));
+  formData.append('Delivery — State',    v('f-del-state'));
+  formData.append('Delivery — Country',  v('f-del-country'));
+  formData.append('Delivery — Contact',  v('f-del-contact'));
+  formData.append('Delivery — Phone',    v('f-del-phone'));
+  formData.append('Delivery — Email',    v('f-del-email'));
+
+  // Step 4 — Delivery details
+  formData.append('Big Truck',           sel('f-bigtruck'));
+  formData.append('Slot Time Required',  sel('f-slottime'));
+  formData.append('Additional Delivery Info', v('f-del-info'));
+  formData.append('Delivery Comments',   v('f-del-comments'));
+  formData.append('Opening Hours Monday',    v('f-mon-from') + ' – ' + v('f-mon-to'));
+  formData.append('Opening Hours Tuesday',   v('f-tue-from') + ' – ' + v('f-tue-to'));
+  formData.append('Opening Hours Wednesday', v('f-wed-from') + ' – ' + v('f-wed-to'));
+  formData.append('Opening Hours Thursday',  v('f-thu-from') + ' – ' + v('f-thu-to'));
+  formData.append('Opening Hours Friday',    v('f-fri-from') + ' – ' + v('f-fri-to'));
+
+  // Step 5 — Trade terms
+  const country = document.getElementById('f-country');
+  const accounttype = document.getElementById('f-accounttype');
+  const incoterm = document.getElementById('f-incoterm');
+  formData.append('Country / Market', country.options[country.selectedIndex]?.text || '');
+  formData.append('Account Type',     accounttype.options[accounttype.selectedIndex]?.text || '');
+  formData.append('Incoterm',         incoterm.options[incoterm.selectedIndex]?.text || '');
+  const t = TERMS[accounttype.value]?.[country.value];
+  if (t) {
+    let ts = `Market: ${t.name}`;
+    if (t.free) ts += ` | Freight free from: ${t.free}`;
+    if (t.below) ts += ` | Freight: ${t.below}`;
+    if (t.fee) ts += ` | Mandatory fee: ${t.fee}`;
+    formData.append('Trade Terms Summary', ts);
   }
 
-  // ── All-time leaderboard ────────────────────────────────────────────────
-  function AllTimeLeaderboard({ tournaments, onViewTable }) {
-    const rows = calcAllTime(tournaments);
-    const medals = ["🥇", "🥈", "🥉"];
-    const max = rows[0]?.total || 1;
-    return (
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <p style={{ fontSize: 10, color: C.sub, fontFamily: "'DM Mono', monospace", textTransform: "uppercase", letterSpacing: 2, margin: 0 }}>ALL TIME LEADERBOARD</p>
-          <button onClick={onViewTable} style={{ background: C.accentDim, border: `1px solid ${C.accent}44`, borderRadius: 8, padding: "4px 12px", color: C.accent, fontSize: 11, fontFamily: "'DM Mono', monospace", cursor: "pointer" }}>Se tabel →</button>
-        </div>
-        <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden" }}>
-          {rows.map((r, i) => (
-            <div key={r.name} style={{ padding: "13px 16px", borderBottom: i < rows.length - 1 ? `1px solid ${C.border}` : "none", display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontSize: i < 3 ? 18 : 13, minWidth: 24, textAlign: "center" }}>{medals[i] || `${i+1}.`}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: i === 0 ? C.accent : C.text, marginBottom: 4 }}>{r.name}</div>
-                <div style={{ height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 2, overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: `${(r.total / max) * 100}%`, background: i === 0 ? C.accent : C.muted, borderRadius: 2, transition: "width 0.4s" }} />
-                </div>
-              </div>
-              <div style={{ textAlign: "right", minWidth: 60 }}>
-                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: i === 0 ? C.accent : C.text, lineHeight: 1 }}>{r.total}</div>
-                <div style={{ fontSize: 10, color: C.sub, fontFamily: "'DM Mono', monospace" }}>{r.played} k · ⌀{r.avg}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+  uploadedFiles.forEach(f => formData.append('Attachments', f));
+
+  try {
+    const res = await fetch('https://formspree.io/f/xzdlzdvw', {
+      method: 'POST', body: formData, headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      const ref = 'FDB-' + Date.now().toString(36).toUpperCase().slice(-5);
+      document.getElementById('ref-number').textContent = ref;
+      document.getElementById('step-6').classList.remove('active');
+      document.getElementById('step-success').classList.add('active');
+      for (let i = 1; i <= 6; i++) { const n = document.getElementById('nav-'+i); if(n) n.className = 'step-nav-item done'; }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else { throw new Error(); }
+  } catch(e) {
+    document.getElementById('error-msg').classList.add('visible');
+    btn.disabled = false;
+    btn.textContent = 'Submit Registration';
   }
+}
 
-  // ── Table screen ────────────────────────────────────────────────────────
-  function TableScreen({ tournaments, onBack }) {
-    const rows = calcAllTime(tournaments);
-    const medals = ["🥇", "🥈", "🥉"];
-    return (
-      <div style={{ padding: "40px 20px 80px" }}>
-        <BackBtn onClick={onBack} />
-        <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, letterSpacing: 2, margin: "16px 0 6px", color: C.accent }}>TABEL</h2>
-        <p style={{ color: C.sub, fontSize: 13, marginBottom: 24, fontFamily: "'DM Mono', monospace" }}>Akkumulerede point fra alle turneringer</p>
-        <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden", marginBottom: 28 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "32px 1fr 56px 56px 56px 56px", padding: "10px 16px", borderBottom: `1px solid ${C.border}`, background: "rgba(255,255,255,0.03)" }}>
-            {["#", "Spiller", "Pts", "K", "W", "⌀"].map(h => (
-              <div key={h} style={{ fontSize: 10, color: C.sub, fontFamily: "'DM Mono', monospace", textTransform: "uppercase", letterSpacing: 1, textAlign: h !== "Spiller" ? "center" : "left" }}>{h}</div>
-            ))}
-          </div>
-          {rows.map((r, i) => (
-            <div key={r.name} style={{ display: "grid", gridTemplateColumns: "32px 1fr 56px 56px 56px 56px", padding: "13px 16px", borderBottom: i < rows.length - 1 ? `1px solid ${C.border}` : "none", background: i === 0 ? C.accentDim : "transparent" }}>
-              <div style={{ fontSize: i < 3 ? 16 : 13, textAlign: "center" }}>{medals[i] || `${i+1}`}</div>
-              <div style={{ fontWeight: 700, fontSize: 14, color: i === 0 ? C.accent : C.text }}>{r.name}</div>
-              <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 20, color: i === 0 ? C.accent : C.text, textAlign: "center", lineHeight: 1.4 }}>{r.total}</div>
-              <div style={{ fontSize: 13, color: C.sub, textAlign: "center", lineHeight: 1.8 }}>{r.played}</div>
-              <div style={{ fontSize: 13, color: C.sub, textAlign: "center", lineHeight: 1.8 }}>{r.wins}</div>
-              <div style={{ fontSize: 13, color: C.sub, textAlign: "center", lineHeight: 1.8 }}>{r.avg}</div>
-            </div>
-          ))}
-        </div>
-        <p style={{ fontSize: 10, color: C.sub, fontFamily: "'DM Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>Turneringer</p>
-        {tournaments.map(t => {
-          const standings = calcStandings(t.players, t.rounds);
-          const totalCourts = t.rounds.flatMap(r => r).length;
-          const played = t.rounds.flatMap(r => r).filter(c => c.score1 !== "" && c.score2 !== "").length;
-          return (
-            <div key={t.id} style={{ background: C.surface, borderRadius: 14, border: `1px solid ${C.border}`, marginBottom: 10, overflow: "hidden" }}>
-              <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255,255,255,0.02)" }}>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 14 }}>{t.name}</div>
-                  <div style={{ display: "flex", gap: 8, marginTop: 3 }}>
-                    <Mono style={{ fontSize: 11, color: C.sub }}>{t.date}</Mono>
-                    {t.venue && <Tag color={C.gold}>{t.venue}</Tag>}
-                  </div>
-                </div>
-                <Mono style={{ fontSize: 11, color: C.sub }}>{played}/{totalCourts} kampe</Mono>
-              </div>
-              {standings.map(([player, pts], i) => (
-                <div key={player} style={{ padding: "10px 16px", borderBottom: i < standings.length - 1 ? `1px solid ${C.border}` : "none", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <span style={{ fontSize: i < 3 ? 14 : 11, minWidth: 20 }}>{["🥇","🥈","🥉"][i] || `${i+1}.`}</span>
-                    <span style={{ fontSize: 14, color: i === 0 ? C.accent : C.text }}>{player}</span>
-                  </div>
-                  <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 20, color: i === 0 ? C.accent : C.text }}>{pts} pt</span>
-                </div>
-              ))}
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-
-  // ── Tournament row ──────────────────────────────────────────────────────
-  function TournamentRow({ t, onClick }) {
-    const standings = calcStandings(t.players, t.rounds);
-    const leader = standings[0];
-    const played = t.rounds.flatMap(r => r).filter(c => c.score1 !== "" && c.score2 !== "").length;
-    const total = t.rounds.flatMap(r => r).length;
-    return (
-      <div style={{ background: C.surface, borderRadius: 14, border: `1px solid ${C.border}`, overflow: "hidden", cursor: "pointer" }} onClick={onClick}>
-        <div style={{ padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 3 }}>{t.name}</div>
-            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-              <Mono style={{ fontSize: 11, color: C.sub }}>{t.date}</Mono>
-              {t.venue && <Tag color={C.gold}>{t.venue}</Tag>}
-              {leader && <span style={{ fontSize: 11, color: C.accent }}>🥇 {leader[0]}</span>}
-            </div>
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 11, color: C.sub, fontFamily: "'DM Mono', monospace" }}>{played}/{total} kampe</div>
-            <div style={{ fontSize: 18, marginTop: 2 }}>›</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Home ────────────────────────────────────────────────────────────────
-  function HomeScreen({ tournaments, onOpenTournament, onNewTournament, onViewTable, onReset, error }) {
-    const [showReset, setShowReset] = useState(false);
-    return (
-      <div style={{ padding: "48px 20px 80px" }}>
-        {showReset && <ResetModal onConfirm={() => { onReset(); setShowReset(false); }} onCancel={() => setShowReset(false)} />}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32 }}>
-          <div>
-            <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 40, letterSpacing: 3, margin: 0, color: C.accent }}>Padel-klubben</h1>
-            <p style={{ margin: "2px 0 0", color: C.sub, fontSize: 13, fontFamily: "'DM Mono', monospace" }}>americano tracker</p>
-          </div>
-          {tournaments.length > 0 && (
-            <button onClick={() => setShowReset(true)} style={{ background: "rgba(255,92,92,0.1)", border: `1px solid ${C.red}44`, borderRadius: 8, padding: "7px 12px", color: C.red, fontSize: 11, fontFamily: "'DM Mono', monospace", cursor: "pointer", marginTop: 6, whiteSpace: "nowrap" }}>
-              🔄 Ny sæson
-            </button>
-          )}
-        </div>
-        {error && <ErrorBanner msg={error} />}
-        <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
-          <Btn onClick={onNewTournament}>🏆 Ny turnering</Btn>
-          <Btn onClick={onViewTable} variant="ghost">📊 Tabel</Btn>
-        </div>
-        {tournaments.length > 0 && <AllTimeLeaderboard tournaments={tournaments} onViewTable={onViewTable} />}
-        {tournaments.length > 0 && (
-          <Section title="TURNERINGER">
-            {tournaments.map(t => <TournamentRow key={t.id} t={t} onClick={() => onOpenTournament(t.id)} />)}
-          </Section>
-        )}
-        {tournaments.length === 0 && (
-          <div style={{ textAlign: "center", padding: "60px 0", color: C.muted }}>
-            <div style={{ fontSize: 52, marginBottom: 12 }}>🎾</div>
-            <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, letterSpacing: 1, color: C.sub }}>Ingen turneringer endnu</p>
-            <p style={{ fontSize: 13 }}>Start med at oprette en turnering!</p>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // ── New Tournament ──────────────────────────────────────────────────────
-  function NewTournamentScreen({ onBack, onCreate }) {
-    const [name, setName] = useState("");
-    const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-    const [venue, setVenue] = useState("");
-    const [players, setPlayers] = useState([]);
-    const [customInput, setCustomInput] = useState("");
-    const [saving, setSaving] = useState(false);
-
-    function toggleKnown(p) { setPlayers(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]); }
-    function addCustom() {
-      const t = customInput.trim();
-      if (t && !players.includes(t)) setPlayers(p => [...p, t]);
-      setCustomInput("");
-    }
-
-    const canCreate = name && venue && players.length >= 4 && players.length % 2 === 0;
-    const numRounds = Math.min(players.length - 1, 3);
-
-    async function handleCreate() {
-      if (!canCreate || saving) return;
-      setSaving(true);
-      const rounds = generateRounds(players);
-      await onCreate({ name, date, venue, players, rounds });
-      setSaving(false);
-    }
-
-    return (
-      <div style={{ padding: "40px 20px 80px" }}>
-        <BackBtn onClick={onBack} />
-        <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, letterSpacing: 2, margin: "16px 0 28px", color: C.accent }}>NY TURNERING</h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <Field label="Turnerings navn"><Input value={name} onChange={setName} placeholder="f.eks. Fredagsturnering" /></Field>
-          <Field label="Dato"><Input type="date" value={date} onChange={setDate} /></Field>
-          <Field label="Bane">
-            <Select value={venue} onChange={setVenue}>
-              <option value="" disabled>Vælg bane...</option>
-              {VENUES.map(v => <option key={v} value={v}>{v}</option>)}
-            </Select>
-          </Field>
-          <Field label={`Spillere (${players.length}) — lige antal, min. 4`}>
-            <p style={{ margin: "0 0 8px", fontSize: 12, color: C.sub }}>Vælg spillere:</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-              {KNOWN_PLAYERS.map(p => {
-                const selected = players.includes(p);
-                return (
-                  <button key={p} onClick={() => toggleKnown(p)} style={{
-                    padding: "9px 18px", borderRadius: 20, border: `1px solid ${selected ? C.accent : C.border}`,
-                    background: selected ? C.accentDim : "rgba(255,255,255,0.03)",
-                    color: selected ? C.accent : C.sub, fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: 600, fontSize: 14, cursor: "pointer", transition: "all 0.15s",
-                  }}>{selected ? "✓ " : ""}{p}</button>
-                );
-              })}
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <Input value={customInput} onChange={setCustomInput} placeholder="Tilføj anden spiller..." style={{ flex: 1 }} onKeyDown={e => e.key === "Enter" && addCustom()} />
-              <Btn onClick={addCustom} disabled={!customInput.trim()} small>+</Btn>
-            </div>
-            {players.filter(p => !KNOWN_PLAYERS.includes(p)).length > 0 && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
-                {players.filter(p => !KNOWN_PLAYERS.includes(p)).map(p => (
-                  <span key={p} onClick={() => setPlayers(prev => prev.filter(x => x !== p))} style={{ background: C.accentDim, color: C.accent, border: `1px solid ${C.accent}44`, borderRadius: 20, padding: "5px 12px", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-                    {p} <span style={{ opacity: 0.6, fontSize: 11 }}>✕</span>
-                  </span>
-                ))}
-              </div>
-            )}
-            {players.length % 2 !== 0 && players.length > 0 && (
-              <p style={{ color: C.red, fontSize: 12, margin: "8px 0 0", fontFamily: "'DM Mono', monospace" }}>⚠ Tilføj 1 spiller mere</p>
-            )}
-          </Field>
-          {canCreate && (
-            <div style={{ background: C.accentDim, borderRadius: 12, padding: "12px 16px", border: `1px solid ${C.accent}33` }}>
-              <p style={{ margin: 0, fontSize: 13, color: C.accent, fontFamily: "'DM Mono', monospace" }}>
-                🎾 {numRounds} runder · {Math.floor(players.length / 4)} bane{Math.floor(players.length / 4) > 1 ? "r" : ""} per runde · {venue}
-              </p>
-            </div>
-          )}
-          <Btn onClick={handleCreate} disabled={!canCreate || saving}>{saving ? "Gemmer..." : "🏆 Opret turnering"}</Btn>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Court card ──────────────────────────────────────────────────────────
-  function CourtCard({ court, courtNum, onScore1, onScore2 }) {
-    const s1 = parseInt(court.score1), s2 = parseInt(court.score2);
-    const valid = !isNaN(s1) && !isNaN(s2) && s1 + s2 === 24;
-    const t1Wins = valid && s1 > s2, t2Wins = valid && s2 > s1;
-    const scoreStyle = { background: "rgba(255,255,255,0.07)", border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 10px", color: C.text, fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", outline: "none", width: "100%", boxSizing: "border-box", colorScheme: "dark", textAlign: "center", letterSpacing: 1 };
-    return (
-      <div style={{ background: C.surface, borderRadius: 14, border: `1px solid ${valid ? C.accent + "44" : C.border}`, overflow: "hidden" }}>
-        <div style={{ padding: "8px 16px", background: valid ? C.accentDim : "transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 10, color: C.sub, fontFamily: "'DM Mono', monospace", letterSpacing: 1 }}>BANE {courtNum}</span>
-          {valid && <Tag color={C.accent}>✓ {s1}–{s2}</Tag>}
-          {!valid && court.score1 !== "" && <Tag color={C.red}>skal give 24 i alt</Tag>}
-        </div>
-        <div style={{ padding: "12px 16px", display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 10, alignItems: "center" }}>
-          <div style={{ background: t1Wins ? C.accentDim : "rgba(255,255,255,0.03)", borderRadius: 10, padding: "10px 12px", border: `1px solid ${t1Wins ? C.accent + "44" : "transparent"}` }}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: t1Wins ? C.accent : C.text }}>{court.team1.join(" & ")}</div>
-            <input type="number" min="0" max="24" value={court.score1} onChange={e => onScore1(e.target.value)} placeholder="0" style={scoreStyle} />
-          </div>
-          <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: C.muted, fontSize: 18 }}>VS</span>
-          <div style={{ background: t2Wins ? C.accentDim : "rgba(255,255,255,0.03)", borderRadius: 10, padding: "10px 12px", border: `1px solid ${t2Wins ? C.accent + "44" : "transparent"}` }}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: t2Wins ? C.accent : C.text }}>{court.team2.join(" & ")}</div>
-            <input type="number" min="0" max="24" value={court.score2} onChange={e => onScore2(e.target.value)} placeholder="0" style={scoreStyle} />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  function StandingRow({ player, pts, rank }) {
-    const medals = ["🥇", "🥈", "🥉"];
-    return (
-      <div style={{ background: rank === 1 ? C.accentDim : C.surface, border: `1px solid ${rank === 1 ? C.accent + "44" : C.border}`, borderRadius: 12, padding: "14px 18px", marginBottom: 8, display: "flex", alignItems: "center", gap: 14 }}>
-        <span style={{ fontSize: rank <= 3 ? 22 : 16, minWidth: 28, textAlign: "center" }}>{medals[rank - 1] || rank}</span>
-        <div style={{ flex: 1, fontWeight: 600, fontSize: 15, color: rank === 1 ? C.accent : C.text }}>{player}</div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 26, color: rank === 1 ? C.accent : C.text, lineHeight: 1 }}>{pts}</div>
-          <div style={{ fontSize: 10, color: C.sub, fontFamily: "'DM Mono', monospace" }}>point</div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Tournament screen ───────────────────────────────────────────────────
-  function TournamentScreen({ tournament, onBack, onUpdateScore }) {
-    const [tab, setTab] = useState("kampe");
-    const { name, date, venue, players, rounds } = tournament;
-    const standings = calcStandings(players, rounds);
-    const totalCourts = rounds.flatMap(r => r).length;
-    const playedCourts = rounds.flatMap(r => r).filter(c => c.score1 !== "" && c.score2 !== "").length;
-    return (
-      <div style={{ padding: "40px 20px 80px" }}>
-        <BackBtn onClick={onBack} />
-        <div style={{ margin: "16px 0 6px" }}>
-          <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 30, letterSpacing: 2, margin: 0 }}>{name}</h2>
-          <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 6, flexWrap: "wrap" }}>
-            <Mono style={{ fontSize: 12, color: C.sub }}>{date}</Mono>
-            {venue && <Tag color={C.gold}>{venue}</Tag>}
-            <Tag>{players.length} spillere</Tag>
-            <Mono style={{ fontSize: 12, color: C.sub }}>{playedCourts}/{totalCourts} spillet</Mono>
-          </div>
-        </div>
-        <div style={{ height: 4, background: C.surface, borderRadius: 2, margin: "14px 0 20px", overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${totalCourts ? (playedCourts / totalCourts) * 100 : 0}%`, background: C.accent, borderRadius: 2, transition: "width 0.3s" }} />
-        </div>
-        <div style={{ display: "flex", gap: 4, marginBottom: 24, background: C.surface, borderRadius: 12, padding: 4 }}>
-          {[["kampe", "Kampe"], ["stilling", "Stilling"]].map(([v, l]) => (
-            <button key={v} onClick={() => setTab(v)} style={{ flex: 1, padding: "10px 0", border: "none", borderRadius: 9, cursor: "pointer", background: tab === v ? C.accent : "transparent", color: tab === v ? "#0b1a0d" : C.sub, fontWeight: 700, fontSize: 13, fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>{l}</button>
-          ))}
-        </div>
-        {tab === "kampe" && rounds.map((courts, ri) => (
-          <div key={ri} style={{ marginBottom: 24 }}>
-            <p style={{ fontSize: 11, color: C.sub, fontFamily: "'DM Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>Runde {ri + 1}</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {courts.map((court, ci) => (
-                <CourtCard key={ci} court={court} courtNum={ci + 1}
-                  onScore1={v => onUpdateScore(ri, ci, "score1", v)}
-                  onScore2={v => onUpdateScore(ri, ci, "score2", v)} />
-              ))}
-            </div>
-          </div>
-        ))}
-        {tab === "stilling" && (
-          <div>{standings.map(([player, pts], i) => <StandingRow key={player} player={player} pts={pts} rank={i + 1} />)}</div>
-        )}
-      </div>
-    );
-  }
-
-  // ── App ─────────────────────────────────────────────────────────────────
-  function App() {
-    const [screen, setScreen] = useState("home");
-    const [tournaments, setTournaments] = useState([]);
-    const [activeTid, setActiveTid] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const saveTimers = useRef({});
-    const pendingEdits = useRef(new Set()); // tournament ids with unsaved local edits
-
-    // Load tournaments from Supabase on mount + subscribe to realtime changes
-    useEffect(() => {
-      loadTournaments();
-
-      const channel = sb.channel("tournaments-changes")
-        .on("postgres_changes", { event: "*", schema: "public", table: "tournaments" }, () => {
-          loadTournaments();
-        })
-        .subscribe();
-
-      return () => sb.removeChannel(channel);
-    }, []);
-
-    async function loadTournaments() {
-      try {
-        const { data, error } = await sb.from("tournaments").select("*").order("created_at", { ascending: false });
-        if (error) throw error;
-        setTournaments(prev => data.map(row => {
-          // If this tournament has unsaved local edits, keep the local version instead of overwriting
-          if (pendingEdits.current.has(row.id)) {
-            const local = prev.find(t => t.id === row.id);
-            if (local) return local;
-          }
-          return { ...row, players: row.players, rounds: row.rounds };
-        }));
-        setError(null);
-      } catch (e) {
-        setError("Kunne ikke hente data: " + e.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    async function createTournament(t) {
-      try {
-        const { data, error } = await sb.from("tournaments").insert([{
-          name: t.name, date: t.date, venue: t.venue,
-          players: t.players, rounds: t.rounds,
-        }]).select().single();
-        if (error) throw error;
-        setActiveTid(data.id);
-        setScreen("tournament");
-        setError(null);
-      } catch (e) {
-        setError("Kunne ikke oprette turnering: " + e.message);
-      }
-    }
-
-    async function updateScore(tid, ri, ci, field, val) {
-      // Update local state immediately and capture new rounds in a ref
-      let newRounds;
-      pendingEdits.current.add(tid);
-      setTournaments(prev => prev.map(t => {
-        if (t.id !== tid) return t;
-        const rounds = t.rounds.map((round, rIdx) =>
-          rIdx !== ri ? round : round.map((court, cIdx) =>
-            cIdx !== ci ? court : { ...court, [field]: val }
-          )
-        );
-        newRounds = rounds;
-        return { ...t, rounds };
-      }));
-
-      // Debounce save — use newRounds captured above (not stale state)
-      clearTimeout(saveTimers.current[tid]);
-      saveTimers.current[`${tid}_rounds`] = newRounds;
-      saveTimers.current[tid] = setTimeout(async () => {
-        const roundsToSave = saveTimers.current[`${tid}_rounds`];
-        if (!roundsToSave) return;
-        try {
-          const { error } = await sb.from("tournaments").update({ rounds: roundsToSave }).eq("id", tid);
-          if (error) throw error;
-          pendingEdits.current.delete(tid);
-        } catch (e) {
-          setError("Kunne ikke gemme score: " + e.message);
-        }
-      }, 600);
-    }
-
-    async function resetAll() {
-      try {
-        const { error } = await sb.from("tournaments").delete().neq("id", 0);
-        if (error) throw error;
-        setTournaments([]);
-        setActiveTid(null);
-        setScreen("home");
-        setError(null);
-      } catch (e) {
-        setError("Kunne ikke nulstille: " + e.message);
-      }
-    }
-
-    if (loading) return <LoadingScreen />;
-
-    const activeTournament = tournaments.find(t => t.id === activeTid);
-
-    return (
-      <div style={{ minHeight: "100vh", background: "transparent", color: C.text, fontFamily: "'DM Sans', sans-serif", maxWidth: 500, margin: "0 auto" }}>
-        {screen === "home" && (
-          <HomeScreen tournaments={tournaments} error={error}
-            onOpenTournament={id => { setActiveTid(id); setScreen("tournament"); }}
-            onNewTournament={() => setScreen("newTournament")}
-            onViewTable={() => setScreen("table")}
-            onReset={resetAll}
-          />
-        )}
-        {screen === "newTournament" && (
-          <NewTournamentScreen onBack={() => setScreen("home")} onCreate={createTournament} />
-        )}
-        {screen === "tournament" && activeTournament && (
-          <TournamentScreen
-            tournament={activeTournament}
-            onBack={() => setScreen("home")}
-            onUpdateScore={(ri, ci, field, val) => updateScore(activeTournament.id, ri, ci, field, val)}
-          />
-        )}
-        {screen === "table" && (
-          <TableScreen tournaments={tournaments} onBack={() => setScreen("home")} />
-        )}
-      </div>
-    );
-  }
-
-  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+function resetForm() {
+  document.querySelectorAll('input,select,textarea').forEach(el => {
+    if (el.type === 'checkbox') el.checked = false;
+    else el.value = '';
+  });
+  document.getElementById('terms-box').classList.remove('visible');
+  uploadedFiles = []; renderFileList();
+  document.getElementById('step-success').classList.remove('active');
+  currentStep = 1;
+  document.getElementById('step-1').classList.add('active');
+  for (let i = 1; i <= 6; i++) { const n = document.getElementById('nav-'+i); if(n) { n.className = 'step-nav-item'; if(i===1) n.classList.add('active'); } }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 </script>
 </body>
 </html>
