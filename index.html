@@ -257,7 +257,7 @@ main { display: flex; min-height: calc(100vh - 64px); }
     <div class="step active" id="step-1">
       <div class="step-eyebrow">Step 1 of 6</div>
       <div class="step-title">Account Setup</div>
-      <div class="step-desc">Basic account settings — to be filled out by the agent.</div>
+      <div class="step-desc">Basic account settings — to be filled out.</div>
 
       <div class="field-grid">
         <div class="field">
@@ -266,9 +266,10 @@ main { display: flex; min-height: calc(100vh - 64px); }
             <option value="">Select…</option>
             <option>WHOLESALE DENMARK</option>
             <option>WHOLESALE NO/SE</option>
-            <option>EXPORT WS/CONTRACT (all other markets than DK/SE/NO)</option>
-            <option>CONTRACT SCANDINAVIA (Contract dealer DK/SE/NO)</option>
+            <option>EXPORT WHOLESALE (all other markets than DK/SE/NO)</option>
+            <option>CONTRACT (Contract dealer)</option>
             <option>B2B-GIFT</option>
+            <option>Other</option>
           </select>
         </div>
         <div class="field">
@@ -551,7 +552,7 @@ main { display: flex; min-height: calc(100vh - 64px); }
     <div class="step" id="step-5">
       <div class="step-eyebrow">Step 5 of 6</div>
       <div class="step-title">Market & Trade Terms</div>
-      <div class="step-desc">Select the customer's country and account type — applicable trade terms appear automatically.</div>
+      <div class="step-desc">Select your market and account type — applicable trade terms appear automatically.</div>
 
       <div class="field-grid">
         <div class="field">
@@ -724,7 +725,7 @@ const TERMS = {
     BE:    { name:'Benelux (NL/BE/LU)',   free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 1,000 EUR: 6% of order value',  inco:'DAP / EX Works', fee:null,                           note:null },
     LU:    { name:'Benelux (NL/BE/LU)',   free:null, below:'Below 1,000 EUR: 100 EUR fee · Above 1,000 EUR: 6% of order value',  inco:'DAP / EX Works', fee:null,                           note:null },
     GB:    { name:'United Kingdom (GB)',  free:null, below:'Below 1,000 GBP: 100 GBP fee · Above 1,000 GBP: 6% of order value', inco:'DAP / EX Works', fee:'45 GBP (Brexit fee, mandatory)', note:null },
-    OTHER: { name:'Other Markets',        free:null, below:null, inco:'DAP / EX Works', fee:'45 EUR (non-EU countries)', note:'Freight quotation required. Credit: prepayment unless otherwise agreed.' },
+    OTHER: { name:'Other Markets',        free:null, below:null, inco:'DAP (Europe) / EX Works', fee:'45 EUR (non-EU countries)', note:'Freight quotation required. Credit: prepayment unless otherwise agreed.' },
   }
 };
 
